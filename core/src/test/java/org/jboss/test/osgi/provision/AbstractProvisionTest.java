@@ -19,11 +19,15 @@
  */
 package org.jboss.test.osgi.provision;
 
+import java.util.Set;
+
+import org.jboss.osgi.provision.ProvisionResult;
 import org.jboss.osgi.provision.ProvisionService;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
 import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XEnvironment;
+import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResolver;
 import org.jboss.osgi.resolver.spi.AbstractEnvironment;
 import org.jboss.osgi.resolver.spi.XResolverFactoryLocator;
@@ -48,11 +52,15 @@ public abstract class AbstractProvisionTest {
         environment = new AbstractEnvironment();
     }
 
-    public ProvisionService getProvisionService() {
+    ProvisionService getProvisionService() {
         return provisionService;
     }
 
-    public XEnvironment getEnvironment() {
+    XEnvironment getEnvironment() {
         return environment;
+    }
+
+    ProvisionResult findResources(Set<XRequirement> reqs) {
+        return getProvisionService().findResources(getEnvironment(), reqs);
     }
 }
