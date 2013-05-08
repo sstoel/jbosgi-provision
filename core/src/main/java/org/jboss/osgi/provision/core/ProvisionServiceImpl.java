@@ -1,15 +1,15 @@
 /*
  * #%L
- * JBossOSGi Provision Core
+ * JBossOSGi Provision: Core
  * %%
  * Copyright (C) 2013 JBoss by Red Hat
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,9 @@
  * limitations under the License.
  * #L%
  */
-package org.jboss.osgi.provision.internal;
+package org.jboss.osgi.provision.core;
+
+import static org.jboss.osgi.provision.ProvisionLogger.LOGGER;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,7 +94,7 @@ public class ProvisionServiceImpl implements ProvisionService {
         if (unstatisfied.isEmpty())
             return;
 
-        // Find installable resources that match the unsatisfied reqs
+        // Find installable resources in the repository that match the unsatisfied reqs
         Set<XResource> installable = new HashSet<XResource>();
         for (XRequirement req : unstatisfied) {
             Collection<Capability> providers = repository.findProviders(req);
@@ -117,6 +119,8 @@ public class ProvisionServiceImpl implements ProvisionService {
             }
         }
 
+        boolean envModified = false;
+        
         // Install the resources that match the unsatisfied reqs
         Set<XResource> installed = result.getResources();
         for (XResource res : installable) {
@@ -124,11 +128,14 @@ public class ProvisionServiceImpl implements ProvisionService {
                 unstatisfied.addAll(getIdentityRequirements(res));
                 env.installResources(res);
                 result.addResource(res);
+                envModified = true;
             }
         }
 
         // Recursivly find the missing resources
-        findResources(env, result, unstatisfied);
+        if (envModified) {
+            findResources(env, result, unstatisfied);
+        }
     }
 
     private Collection<? extends XIdentityRequirement> getIdentityRequirements(XResource res) {
@@ -145,8 +152,9 @@ public class ProvisionServiceImpl implements ProvisionService {
             unresolved.add(req.getResource());
         }
         try {
-            XResolveContext context = resolver.createResolveContext(env, null, unresolved);
-            for (Entry<Resource, List<Wire>> entry : resolver.resolve(context).entrySet()) {
+            XResolveContext context = resolver.createResolveContext(env, unresolved, null);
+            Set<Entry<Resource, List<Wire>>> wiremap = resolver.resolve(context).entrySet();
+            for (Entry<Resource, List<Wire>> entry : wiremap) {
                 Iterator<XRequirement> itunsat = unstatisfied.iterator();
                 while (itunsat.hasNext()) {
                     XRequirement req = itunsat.next();
@@ -160,7 +168,11 @@ public class ProvisionServiceImpl implements ProvisionService {
                 }
             }
         } catch (ResolutionException ex) {
-            // ignore
+            Collection<Requirement> reqs = ex.getUnresolvedRequirements();
+            Collection<?> logreqs = reqs.isEmpty() ? unstatisfied : reqs;
+            for (Object req : logreqs) {
+                LOGGER.debugf("Unresolved requirement: %s", req);
+            }
         }
     }
 

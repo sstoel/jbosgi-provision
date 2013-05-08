@@ -45,12 +45,15 @@
 
     <!-- Properties -->
     <properties>
+        <version.jboss.arquillian.core>1.0.3.Final</version.jboss.arquillian.core>
+        <version.jboss.arquillian.osgi>2.0.0.CR2</version.jboss.arquillian.osgi>
         <version.jboss.logging>3.1.2.GA</version.jboss.logging>
         <version.jboss.logging.processor>1.1.0.Beta1</version.jboss.logging.processor>
         <version.jboss.logmanager>1.4.0.Beta1</version.jboss.logmanager>
         <version.jboss.modules>1.2.0.Final</version.jboss.modules>
-        <version.jboss.osgi.resolver>4.0.0.CR13</version.jboss.osgi.resolver>
-        <version.jboss.osgi.repository>3.0.0.CR4</version.jboss.osgi.repository>
+        <version.jboss.osgi.framework>3.0.0.CR24-SNAPSHOT</version.jboss.osgi.framework>
+        <version.jboss.osgi.resolver>4.0.0.CR14-SNAPSHOT</version.jboss.osgi.resolver>
+        <version.jboss.osgi.repository>3.0.0.CR5-SNAPSHOT</version.jboss.osgi.repository>
         <version.jboss.osgi.testing>2.0.0.CR2</version.jboss.osgi.testing>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
@@ -60,6 +63,16 @@
     <!-- Dependency Management -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.jboss.arquillian.junit</groupId>
+                <artifactId>arquillian-junit-container</artifactId>
+                <version>${version.jboss.arquillian.core}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.container</groupId>
+                <artifactId>arquillian-container-osgi-embedded</artifactId>
+                <version>${version.jboss.arquillian.osgi}</version>
+            </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
@@ -81,6 +94,11 @@
                 <version>${version.jboss.modules}</version>
             </dependency>
             <dependency>
+                <groupId>org.jboss.osgi.framework</groupId>
+                <artifactId>jbosgi-framework-core</artifactId>
+                <version>${version.jboss.osgi.framework}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jboss.osgi.resolver</groupId>
                 <artifactId>jbosgi-resolver-api</artifactId>
                 <version>${version.jboss.osgi.resolver}</version>
@@ -97,7 +115,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.osgi.repository</groupId>
-                <artifactId>jbosgi-repository-core</artifactId>
+                <artifactId>jbosgi-repository-bundle</artifactId>
                 <version>${version.jboss.osgi.repository}</version>
             </dependency>
             
@@ -130,6 +148,8 @@
     <!-- Modules -->
     <modules>
         <module>core</module>
+        <module>bundle</module>
+        <module>itests</module>
     </modules>
 
     <build>

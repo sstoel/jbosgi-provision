@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  JBossOSGi Provision: Bundle
+  %%
+  Copyright (C) 2013 JBoss by Red Hat
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jboss.osgi.provision</groupId>
+        <artifactId>jbosgi-provision-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <name>JBossOSGi Provision: Bundle</name>
+
+    <artifactId>jbosgi-provision-bundle</artifactId>
+    <packaging>bundle</packaging>
+
+	<!-- Dependencies -->
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.osgi.provision</groupId>
+            <artifactId>jbosgi-provision-core</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.osgi.repository</groupId>
+            <artifactId>jbosgi-repository-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.osgi.resolver</groupId>
+            <artifactId>jbosgi-resolver-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- [JBOSGI-585] Separate maven project.version from bundle.version and package version -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals><goal>parse-version</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <phase>validate</phase>
+                    <goals><goal>run</goal></goals>
+                    <configuration>
+                      <exportAntProperties>true</exportAntProperties>
+                      <target>
+                       <condition property="final.version">
+                          <matches string="${project.version}" pattern="(.*)Final" />
+                       </condition>
+                       <condition property="bundle.version" value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
+                          <isset property="final.version" />
+                       </condition>
+                       <condition property="bundle.version" value="${project.version}">
+                          <not><isset property="final.version" /></not>
+                       </condition>
+                       <echo message="bundle.version=${bundle.version}" />
+                      </target>
+                    </configuration>
+                  </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>jbosgi-provision</Bundle-SymbolicName>
+                        <Bundle-Version>${bundle.version}</Bundle-Version>
+                        <Bundle-Activator>org.jboss.osgi.provision.internal.ProvisionServiceActivator</Bundle-Activator>
+                        <Export-Package>
+                            org.jboss.osgi.provision;version="${bundle.version}",
+                        </Export-Package>
+                        <Import-Package>
+                            org.jboss.logging;version="[3.0,4.0)",
+                            org.jboss.osgi.resolver;version="[4.0,5.0)",
+                            org.jboss.osgi.resolver.spi;version="[4.0,5.0)",
+                            org.jboss.osgi.repository;version="[3.0,4.0)",
+                            org.jboss.osgi.repository.spi;version="[3.0,4.0)",
+                            org.osgi.framework;version="[1.7,2.0)",
+                            org.osgi.resource;version="[1.0,2.0)",
+                            org.osgi.service.repository;version="[1.0,2.0)",
+                            org.osgi.service.resolver;version="[1.0,2.0)",
+                            org.osgi.util.tracker;version="[1.5,2.0)",
+                        </Import-Package>
+                        <Private-Package>
+                        	org.jboss.osgi.provision.core, 
+                        	org.jboss.osgi.provision.internal
+                        </Private-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

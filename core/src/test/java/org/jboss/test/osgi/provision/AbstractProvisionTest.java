@@ -1,6 +1,6 @@
 /*
  * #%L
- * JBossOSGi Provision Core
+ * JBossOSGi Provision: Core
  * %%
  * Copyright (C) 2013 JBoss by Red Hat
  * %%
@@ -25,6 +25,7 @@ import org.jboss.osgi.provision.ProvisionResult;
 import org.jboss.osgi.provision.ProvisionService;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
+import org.jboss.osgi.repository.spi.MavenDelegateRepository;
 import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XRequirement;
@@ -47,7 +48,7 @@ public abstract class AbstractProvisionTest {
     @Before
     public void setUp() throws Exception {
         XResolver resolver = XResolverFactoryLocator.getResolverFactory().createResolver();
-        XPersistentRepository repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory());
+        XPersistentRepository repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenDelegateRepository());
         provisionService = new ProvisionService.Factory().createProvisionService(resolver, repository);
         environment = new AbstractEnvironment();
     }

@@ -1,6 +1,6 @@
 /*
  * #%L
- * JBossOSGi Provision Core
+ * JBossOSGi Provision: Core
  * %%
  * Copyright (C) 2013 JBoss by Red Hat
  * %%

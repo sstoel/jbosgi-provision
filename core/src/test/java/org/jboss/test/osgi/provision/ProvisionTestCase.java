@@ -1,15 +1,15 @@
 /*
  * #%L
- * JBossOSGi Provision Core
+ * JBossOSGi Provision: Core
  * %%
  * Copyright (C) 2013 JBoss by Red Hat
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,9 +28,10 @@ import org.jboss.osgi.provision.ProvisionResult;
 import org.jboss.osgi.provision.ProvisionService;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XPersistentRepository;
-import org.jboss.osgi.repository.XRequirementBuilder;
+import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XRequirement;
+import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
@@ -145,6 +146,18 @@ public class ProvisionTestCase extends AbstractProvisionTest {
         Assert.assertEquals(res2, result.getRequirementMapping().get(req));
         Assert.assertEquals("One resources", 1, result.getResources().size());
         Assert.assertEquals(res2, result.getResources().iterator().next());
+        Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
+    }
+    
+    @Test
+    public void testMavenCoordinates() throws Exception {
+
+        MavenCoordinates mavenid = MavenCoordinates.parse("org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final");
+        XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
+
+        ProvisionService provisionService = getProvisionService();
+        ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
+        Assert.assertEquals("One resource", 1, result.getResources().size()); 
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
     }
 }

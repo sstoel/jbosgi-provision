@@ -1,6 +1,6 @@
 /*
  * #%L
- * JBossOSGi Provision Core
+ * JBossOSGi Provision: Core
  * %%
  * Copyright (C) 2013 JBoss by Red Hat
  * %%
@@ -21,7 +21,7 @@ package org.jboss.osgi.provision;
 
 import java.util.Set;
 
-import org.jboss.osgi.provision.internal.ProvisionServiceImpl;
+import org.jboss.osgi.provision.core.ProvisionServiceImpl;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XRequirement;
