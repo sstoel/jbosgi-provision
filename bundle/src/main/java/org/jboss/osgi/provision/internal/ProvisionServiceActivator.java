@@ -19,14 +19,26 @@
  */
 package org.jboss.osgi.provision.internal;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.jboss.osgi.provision.AbstractProvisionService;
+import org.jboss.osgi.provision.ProvisionException;
 import org.jboss.osgi.provision.ProvisionService;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XResolver;
+import org.jboss.osgi.resolver.XResource;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.repository.RepositoryContent;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -37,6 +49,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class ProvisionServiceActivator implements BundleActivator {
 
+    private final AtomicLong installIndex = new AtomicLong();
     private ServiceTracker<XResolver, XResolver> resolverTracker;
     private ServiceTracker<XRepository, XPersistentRepository> repositoryTracker;
     private ServiceRegistration<ProvisionService> registration;
@@ -75,10 +88,27 @@ public class ProvisionServiceActivator implements BundleActivator {
             registration.unregister();
     }
 
-    private void createProvisionService(BundleContext context, XResolver resolver, XPersistentRepository repository) {
+    private void createProvisionService(final BundleContext context, final XResolver resolver, final XPersistentRepository repository) {
         if (resolver != null && repository != null) {
-            ProvisionService.Factory factory = new ProvisionService.Factory();
-            ProvisionService service = factory.createProvisionService(resolver, repository);
+            ProvisionService service = new AbstractProvisionService(resolver, repository) {
+                @Override
+                @SuppressWarnings("unchecked")
+                public <T> List<T> installResources(List<XResource> resources) throws ProvisionException {
+                    String locationBase = context.getBundle().getLocation();
+                    List<T> result = new ArrayList<T>();
+                    for (XResource res : resources) {
+                        try {
+                            String location = locationBase + "/resource" + installIndex.incrementAndGet();
+                            InputStream input = ((RepositoryContent) res).getContent();
+                            Bundle bundle = context.installBundle(location, input);
+                            result.add((T) bundle);
+                        } catch (BundleException ex) {
+                            throw new ProvisionException(ex);
+                        }
+                    }
+                    return Collections.unmodifiableList(result);
+                }
+            };
             registration = context.registerService(ProvisionService.class, service, null);
         }
     }

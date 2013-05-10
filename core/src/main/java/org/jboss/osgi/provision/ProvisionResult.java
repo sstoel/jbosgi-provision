@@ -19,6 +19,7 @@
  */
 package org.jboss.osgi.provision;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public interface ProvisionResult {
 
     Map<XRequirement, XResource> getRequirementMapping();
 
-    Set<XResource> getResources();
+    List<XResource> getResources();
 
     Set<XRequirement> getUnsatisfiedRequirements();
 }

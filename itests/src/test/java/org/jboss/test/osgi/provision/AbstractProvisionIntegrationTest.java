@@ -19,16 +19,24 @@ package org.jboss.test.osgi.provision;
  * #L%
  */
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
 
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.osgi.provision.ProvisionException;
+import org.jboss.osgi.provision.ProvisionResult;
 import org.jboss.osgi.provision.ProvisionService;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
+import org.jboss.osgi.repository.RepositoryXMLReader;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XEnvironment;
+import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
@@ -38,45 +46,56 @@ import org.osgi.framework.ServiceReference;
  * @author thomas.diesler@jboss.com
  * @since 07-May-2013
  */
-public abstract class AbstractProvisionTestCase {
+public abstract class AbstractProvisionIntegrationTest {
 
-    private static final AtomicBoolean initialized = new AtomicBoolean();
-
+    @ArquillianResource
+    BundleContext context;
+    
     @Before
     public void setUp () throws Exception {
-        if (initialized.compareAndSet(false, true)) {
-            initializeRepository((XPersistentRepository) getRepository());
-        }
+        initializeRepository();
     }
-
-    protected void initializeRepository(XPersistentRepository repo) throws Exception {
+    
+    void initializeRepository() throws Exception {
         // remove all resources
-        RepositoryStorage storage = repo.getRepositoryStorage();
+        RepositoryStorage storage = getRepository().getRepositoryStorage();
         RepositoryReader reader = storage.getRepositoryReader();
         XResource resource = reader.nextResource();
         while (resource != null) {
             storage.removeResource(resource);
             resource = reader.nextResource();
         }
+        // add initial resources
+        InputStream input = getClass().getResourceAsStream("/repository/repository.xml");
+        reader = RepositoryXMLReader.create(input);
+        resource = reader.nextResource();
+        while (resource != null) {
+            storage.addResource(resource);
+            resource = reader.nextResource();
+        }
     }
-
-    abstract BundleContext getBundleContext();
-
-    protected XEnvironment getEnvironment() {
-        BundleContext context = getBundleContext();
+    
+    XEnvironment getEnvironment() {
         ServiceReference<XEnvironment> sref = context.getServiceReference(XEnvironment.class);
         return sref != null ? context.getService(sref) : null;
     }
 
-    protected XRepository getRepository() {
-        BundleContext context = getBundleContext();
+    XPersistentRepository getRepository() {
         ServiceReference<XRepository> sref = context.getServiceReference(XRepository.class);
-        return sref != null ? context.getService(sref) : null;
+        return (XPersistentRepository) (sref != null ? context.getService(sref) : null);
     }
 
-    protected ProvisionService getProvisionService() {
-        BundleContext context = getBundleContext();
+    ProvisionService getProvisionService() {
         ServiceReference<ProvisionService> sref = context.getServiceReference(ProvisionService.class);
         return sref != null ? context.getService(sref) : null;
     }
+
+    ProvisionResult findResources(Set<XRequirement> reqs) {
+        return getProvisionService().findResources(getEnvironment(), reqs);
+    }
+    
+    List<Bundle> installResources(ProvisionResult result) throws ProvisionException {
+        return getProvisionService().installResources(result.getResources());
+    }
+    
 }

@@ -119,9 +119,9 @@ public class ProvisionTestCase extends AbstractProvisionTest {
         XRequirement req = rbuilder.getRequirement();
 
         ProvisionResult result = findResources(Collections.singleton(req));
-        Assert.assertEquals(res1, result.getRequirementMapping().get(req));
         Assert.assertEquals("Two resources", 2, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
+        Assert.assertEquals(res1, result.getRequirementMapping().get(req));
     }
 
     @Test

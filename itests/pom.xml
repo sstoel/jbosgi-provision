@@ -126,25 +126,4 @@
         </plugins>
     </build>
 
-	<profiles>
-
-		<profile>
-			<id>jboss</id>
-			<activation>
-				<property>
-					<name>!framework</name>
-				</property>
-			</activation>
-			<properties>
-				<jboss.osgi.framework.properties>jboss-osgi-framework.properties</jboss.osgi.framework.properties>
-			</properties>
-			<dependencies>
-			</dependencies>
-			<build>
-				<plugins>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 </project>
