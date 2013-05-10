@@ -102,20 +102,23 @@ public class ProvisionIntegrationTestCase extends AbstractProvisionIntegrationTe
     
     @Test
     public void testAbstractFeature() throws Exception {
-        XRequirementBuilder reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "event.admin.feature");
-        XRequirement req = reqbuilder.getRequirement();
-        
-        ProvisionResult result = findResources(Collections.singleton(req));
+        XRequirementBuilder reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "felix.eventadmin.feature");
+        ProvisionResult result = findResources(Collections.singleton(reqbuilder.getRequirement()));
         Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
         
         List<Bundle> bundles = installResources(result);
         Assert.assertEquals("One bundle", 1, bundles.size());
 
+        // Verify that we can now access the installed resource directly
         reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "org.apache.felix.eventadmin");
-        req = reqbuilder.getRequirement();
-        
-        result = findResources(Collections.singleton(req));
+        result = findResources(Collections.singleton(reqbuilder.getRequirement()));
+        Assert.assertEquals("No resource", 0, result.getResources().size());
+        Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
+
+        // Verify that we can require the feature again
+        reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "felix.eventadmin.feature");
+        result = findResources(Collections.singleton(reqbuilder.getRequirement()));
         Assert.assertEquals("No resource", 0, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
     }

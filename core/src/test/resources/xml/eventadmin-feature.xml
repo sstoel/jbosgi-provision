@@ -2,7 +2,7 @@
 <repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="PersistentRepository">
   <resource>
     <capability namespace="osgi.identity">
-      <attribute name="osgi.identity" value="event.admin.feature" />
+      <attribute name="osgi.identity" value="felix.eventadmin.feature" />
       <attribute name="type" value="abstract" />
     </capability>
     <requirement namespace="osgi.identity">

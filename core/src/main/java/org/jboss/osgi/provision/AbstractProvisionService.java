@@ -89,9 +89,9 @@ public class AbstractProvisionService implements ProvisionService {
             throw MESSAGES.illegalArgumentNull("env");
         if (reqs == null)
             throw MESSAGES.illegalArgumentNull("reqs");
-        
+
         LOGGER.debugf("START findResources: %s", reqs);
-        
+
         // Install the unresolved resources into the cloned environment
         List<XResource> unresolved = new ArrayList<XResource>();
         XEnvironment envclone = cloneEnvironment(env);
@@ -102,53 +102,55 @@ public class AbstractProvisionService implements ProvisionService {
                 unresolved.add(res);
             }
         }
-        
+
         // Find the resources in the cloned environment
         List<XResource> resources = new ArrayList<XResource>();
         Set<XRequirement> unstatisfied = new HashSet<XRequirement>(reqs);
         Map<XRequirement, XResource> mapping = new HashMap<XRequirement, XResource>();
         findResources(envclone, unresolved, mapping, unstatisfied, resources);
-        
+
         // Remove abstract resources
         Iterator<XResource> itres = resources.iterator();
-        while(itres.hasNext()) {
+        while (itres.hasNext()) {
             XResource res = itres.next();
             if (res.isAbstract()) {
                 itres.remove();
             }
         }
-        
+
         AbstractProvisionResult result = new AbstractProvisionResult(mapping, unstatisfied, resources);
         LOGGER.debugf("END findResources");
         LOGGER.debugf("  resources: %s", result.getResources());
         LOGGER.debugf("  unsatisfied: %s", result.getUnsatisfiedRequirements());
-        
+
         return result;
     }
 
-    private void findResources(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied, List<XResource> resources) {
+    private void findResources(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied,
+            List<XResource> resources) {
 
         // Resolve the unsatisfied reqs in the environment
         resolveInEnvironment(env, unresolved, mapping, unstatisfied, resources);
         if (unstatisfied.isEmpty())
             return;
 
-        // Find installable resources in the repository that match the unsatisfied reqs
+        LOGGER.debugf("Finding unsatisfied reqs");
         Set<XResource> installable = new HashSet<XResource>();
         Iterator<XRequirement> itun = unstatisfied.iterator();
         while (itun.hasNext()) {
             XRequirement req = itun.next();
-            Collection<Capability> providers = repository.findProviders(req);
-            if (providers.size() == 0) 
+            if (!env.findProviders(req).isEmpty()) {
+                LOGGER.debugf(" %s found in environment", req);
                 continue;
+            }
             
-            XResource resource;
+            Collection<Capability> providers = repository.findProviders(req);
             if (providers.size() == 1) {
-                // Found exactly one provider
                 XIdentityCapability icap = (XIdentityCapability) providers.iterator().next();
-                resource = icap.getResource();
-            } else {
-                // Found multiple providers, prefer the one with the higest version
+                LOGGER.debugf(" %s found one: %s", req, icap);
+                installable.add(icap.getResource());
+                
+            } else if (providers.size() > 1) {
                 List<XIdentityCapability> sorted = new ArrayList<XIdentityCapability>();
                 for (Capability cap : providers) {
                     sorted.add((XIdentityCapability) cap);
@@ -161,12 +163,14 @@ public class AbstractProvisionService implements ProvisionService {
                         return v2.compareTo(v1);
                     }
                 });
-                
-                XIdentityCapability icap = sorted.get(0);
-                resource = icap.getResource();
-            }
-            installable.add(resource);
 
+                LOGGER.debugf(" %s found multiple: %s", req, sorted);
+                XIdentityCapability icap = sorted.get(0);
+                installable.add(icap.getResource());
+            } else {
+                LOGGER.debugf(" %s not found", req);
+            }
+            
             // Remove an unsatisfied maven requirement 
             if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(req.getNamespace()))
                 itun.remove();
@@ -179,7 +183,7 @@ public class AbstractProvisionService implements ProvisionService {
         // Install the resources that match the unsatisfied reqs
         for (XResource res : installable) {
             if (!resources.contains(res)) {
-                LOGGER.debugf("Found in repository: %s", res);
+                LOGGER.debugf("Adding to resources: %s", res);
                 unstatisfied.addAll(getRequirements(res, namespaces));
                 env.installResources(res);
                 resources.add(res);
@@ -209,7 +213,8 @@ public class AbstractProvisionService implements ProvisionService {
         return reqs;
     }
 
-    private void resolveInEnvironment(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied, List<XResource> resources) {
+    private void resolveInEnvironment(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied,
+            List<XResource> resources) {
         List<XResource> mandatory = new ArrayList<XResource>();
         mandatory.addAll(unresolved);
         mandatory.addAll(resources);
@@ -231,7 +236,7 @@ public class AbstractProvisionService implements ProvisionService {
             }
         } catch (ResolutionException ex) {
             for (Requirement req : ex.getUnresolvedRequirements()) {
-                LOGGER.debugf("Unresolved requirement: %s", req);
+                LOGGER.debugf(" unresolved: %s", req);
             }
         }
     }
