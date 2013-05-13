@@ -48,7 +48,7 @@ import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResourceBuilder;
 import org.jboss.osgi.resolver.XResourceBuilderFactory;
 import org.jboss.osgi.resolver.spi.AbstractEnvironment;
-import org.jboss.osgi.resolver.spi.XResolverFactoryLocator;
+import org.jboss.osgi.resolver.spi.AbstractResolver;
 import org.junit.Before;
 import org.osgi.framework.Version;
 
@@ -66,9 +66,9 @@ public abstract class AbstractProvisionTest {
 
     @Before
     public void setUp() throws Exception {
-        XResolver resolver = XResolverFactoryLocator.getResolverFactory().createResolver();
-        repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenDelegateRepository());
         environment = new AbstractEnvironment();
+        XResolver resolver = new AbstractResolver();
+        repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenDelegateRepository());
         provisionService = new AbstractProvisionService(resolver, repository) {
             @Override
             public <T> List<T> installResources(List<XResource> resources) throws ProvisionException {

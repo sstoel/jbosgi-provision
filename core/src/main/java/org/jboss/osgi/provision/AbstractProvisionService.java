@@ -213,8 +213,7 @@ public class AbstractProvisionService implements ProvisionService {
         return reqs;
     }
 
-    private void resolveInEnvironment(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied,
-            List<XResource> resources) {
+    private void resolveInEnvironment(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied, List<XResource> resources) {
         List<XResource> mandatory = new ArrayList<XResource>();
         mandatory.addAll(unresolved);
         mandatory.addAll(resources);
