@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jboss.osgi.provision.AbstractProvisionService;
+import org.jboss.osgi.provision.AbstractResourceProvisioner;
 import org.jboss.osgi.provision.ProvisionException;
-import org.jboss.osgi.provision.ProvisionService;
+import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XResolver;
@@ -47,12 +47,12 @@ import org.osgi.util.tracker.ServiceTracker;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public class ProvisionServiceActivator implements BundleActivator {
+public class ResourceProvisionerActivator implements BundleActivator {
 
     private final AtomicLong installIndex = new AtomicLong();
     private ServiceTracker<XResolver, XResolver> resolverTracker;
     private ServiceTracker<XRepository, XPersistentRepository> repositoryTracker;
-    private ServiceRegistration<ProvisionService> registration;
+    private ServiceRegistration<XResourceProvisioner> registration;
 
     @Override
     public void start(final BundleContext context) throws Exception {
@@ -90,7 +90,7 @@ public class ProvisionServiceActivator implements BundleActivator {
 
     private void createProvisionService(final BundleContext context, final XResolver resolver, final XPersistentRepository repository) {
         if (resolver != null && repository != null) {
-            ProvisionService service = new AbstractProvisionService(resolver, repository) {
+            XResourceProvisioner service = new AbstractResourceProvisioner(resolver, repository) {
                 @Override
                 @SuppressWarnings("unchecked")
                 public <T> List<T> installResources(List<XResource> resources) throws ProvisionException {
@@ -109,7 +109,7 @@ public class ProvisionServiceActivator implements BundleActivator {
                     return Collections.unmodifiableList(result);
                 }
             };
-            registration = context.registerService(ProvisionService.class, service, null);
+            registration = context.registerService(XResourceProvisioner.class, service, null);
         }
     }
 }

@@ -26,7 +26,7 @@ import java.util.Set;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.osgi.provision.ProvisionException;
 import org.jboss.osgi.provision.ProvisionResult;
-import org.jboss.osgi.provision.ProvisionService;
+import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryXMLReader;
@@ -46,7 +46,7 @@ import org.osgi.framework.ServiceReference;
  * @author thomas.diesler@jboss.com
  * @since 07-May-2013
  */
-public abstract class AbstractProvisionIntegrationTest {
+public abstract class AbstractProvisionerIntegrationTest {
 
     @ArquillianResource
     BundleContext context;
@@ -85,8 +85,8 @@ public abstract class AbstractProvisionIntegrationTest {
         return (XPersistentRepository) (sref != null ? context.getService(sref) : null);
     }
 
-    ProvisionService getProvisionService() {
-        ServiceReference<ProvisionService> sref = context.getServiceReference(ProvisionService.class);
+    XResourceProvisioner getProvisionService() {
+        ServiceReference<XResourceProvisioner> sref = context.getServiceReference(XResourceProvisioner.class);
         return sref != null ? context.getService(sref) : null;
     }
 

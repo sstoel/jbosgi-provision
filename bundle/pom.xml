@@ -102,7 +102,7 @@
                     <instructions>
                         <Bundle-SymbolicName>jbosgi-provision</Bundle-SymbolicName>
                         <Bundle-Version>${bundle.version}</Bundle-Version>
-                        <Bundle-Activator>org.jboss.osgi.provision.internal.ProvisionServiceActivator</Bundle-Activator>
+                        <Bundle-Activator>org.jboss.osgi.provision.internal.ResourceProvisionerActivator</Bundle-Activator>
                         <Export-Package>
                             org.jboss.osgi.provision;version="${bundle.version}",
                         </Export-Package>

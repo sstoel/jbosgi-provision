@@ -25,7 +25,7 @@ import java.util.Iterator;
 import junit.framework.Assert;
 
 import org.jboss.osgi.provision.ProvisionResult;
-import org.jboss.osgi.provision.ProvisionService;
+import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
@@ -40,12 +40,12 @@ import org.osgi.framework.namespace.IdentityNamespace;
 
 
 /**
- * Test the {@link ProvisionService}.
+ * Test the {@link XResourceProvisioner}.
  *
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public class ProvisionTestCase extends AbstractProvisionTest {
+public class ProvisionerTestCase extends AbstractProvisionerTest {
 
     @Test
     public void testEmptyEnvironment() {
@@ -56,7 +56,7 @@ public class ProvisionTestCase extends AbstractProvisionTest {
 
     @Test
     public void testEmptyRepository() {
-        ProvisionService provision = getProvisionService();
+        XResourceProvisioner provision = getProvisioner();
         XPersistentRepository repository = provision.getRepository();
         RepositoryStorage storage = repository.getRepositoryStorage();
         XResource resource = storage.getRepositoryReader().nextResource();
@@ -84,7 +84,7 @@ public class ProvisionTestCase extends AbstractProvisionTest {
         XResourceBuilder<XResource> cbuilder = XResourceBuilderFactory.create();
         cbuilder.addCapability(IdentityNamespace.IDENTITY_NAMESPACE, "res1");
         XResource res = cbuilder.getResource();
-        XPersistentRepository repository = getProvisionService().getRepository();
+        XPersistentRepository repository = getProvisioner().getRepository();
         RepositoryStorage storage = repository.getRepositoryStorage();
         storage.addResource(res);
 
@@ -110,7 +110,7 @@ public class ProvisionTestCase extends AbstractProvisionTest {
         cbuilder.addCapability(IdentityNamespace.IDENTITY_NAMESPACE, "res2");
         XResource res2 = cbuilder.getResource();
 
-        XPersistentRepository repository = getProvisionService().getRepository();
+        XPersistentRepository repository = getProvisioner().getRepository();
         RepositoryStorage storage = repository.getRepositoryStorage();
         storage.addResource(res1);
         storage.addResource(res2);
@@ -134,7 +134,7 @@ public class ProvisionTestCase extends AbstractProvisionTest {
         cbuilder.addCapability(IdentityNamespace.IDENTITY_NAMESPACE, "res1").getAttributes().put("version", "2.0.0");
         XResource res2 = cbuilder.getResource();
 
-        XPersistentRepository repository = getProvisionService().getRepository();
+        XPersistentRepository repository = getProvisioner().getRepository();
         RepositoryStorage storage = repository.getRepositoryStorage();
         storage.addResource(res1);
         storage.addResource(res2);
@@ -155,7 +155,7 @@ public class ProvisionTestCase extends AbstractProvisionTest {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
 
-        ProvisionService provisionService = getProvisionService();
+        XResourceProvisioner provisionService = getProvisioner();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
         Assert.assertEquals("One resource", 1, result.getResources().size()); 
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());

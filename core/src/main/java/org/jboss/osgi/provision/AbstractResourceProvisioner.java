@@ -58,12 +58,12 @@ import org.osgi.service.resolver.ResolutionException;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public class AbstractProvisionService implements ProvisionService {
+public class AbstractResourceProvisioner implements XResourceProvisioner {
 
     private final XResolver resolver;
     private final XPersistentRepository repository;
 
-    public AbstractProvisionService(XResolver resolver, XPersistentRepository repository) {
+    public AbstractResourceProvisioner(XResolver resolver, XPersistentRepository repository) {
         this.resolver = resolver;
         this.repository = repository;
     }

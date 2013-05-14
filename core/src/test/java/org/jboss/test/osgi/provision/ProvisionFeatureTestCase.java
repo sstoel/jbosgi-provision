@@ -23,19 +23,19 @@ import java.util.Collections;
 import junit.framework.Assert;
 
 import org.jboss.osgi.provision.ProvisionResult;
-import org.jboss.osgi.provision.ProvisionService;
+import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.junit.Test;
 import org.osgi.framework.namespace.IdentityNamespace;
 
 
 /**
- * Test the {@link ProvisionService}.
+ * Test the {@link XResourceProvisioner}.
  *
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public class ProvisionFeatureTestCase extends AbstractProvisionTest {
+public class ProvisionFeatureTestCase extends AbstractProvisionerTest {
 
     @Test
     public void testAbstractFeature() throws Exception {

@@ -28,7 +28,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.osgi.metadata.OSGiManifestBuilder;
 import org.jboss.osgi.provision.ProvisionResult;
-import org.jboss.osgi.provision.ProvisionService;
+import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XRequirement;
@@ -53,7 +53,7 @@ import org.osgi.service.repository.Repository;
  * @since 07-May-2013
  */
 @RunWith(Arquillian.class)
-public class ProvisionIntegrationTestCase extends AbstractProvisionIntegrationTest {
+public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrationTest {
 
     @ArquillianResource 
     BundleContext context;
@@ -61,7 +61,7 @@ public class ProvisionIntegrationTestCase extends AbstractProvisionIntegrationTe
     @Deployment
     public static JavaArchive createdeployment() {
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "provision-tests");
-        archive.addClasses(AbstractProvisionIntegrationTest.class);
+        archive.addClasses(AbstractProvisionerIntegrationTest.class);
         archive.addAsResource("repository/repository.xml");
         archive.setManifest(new Asset() {
             @Override
@@ -69,7 +69,7 @@ public class ProvisionIntegrationTestCase extends AbstractProvisionIntegrationTe
                 OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
                 builder.addBundleSymbolicName(archive.getName());
                 builder.addBundleManifestVersion(2);
-                builder.addImportPackages(BundleContext.class, ProvisionService.class);
+                builder.addImportPackages(BundleContext.class, XResourceProvisioner.class);
                 builder.addImportPackages(XRepository.class, Repository.class, XResource.class);
                 return builder.openStream();
             }
@@ -84,7 +84,7 @@ public class ProvisionIntegrationTestCase extends AbstractProvisionIntegrationTe
         XRequirement req = XRequirementBuilder.create(mvnid).getRequirement();
         Assert.assertNotNull("Requirement not null", req);
 
-        ProvisionService provisionService = getProvisionService();
+        XResourceProvisioner provisionService = getProvisionService();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
         Assert.assertEquals("One resource", 1, result.getResources().size()); 
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());

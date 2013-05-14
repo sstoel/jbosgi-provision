@@ -34,7 +34,7 @@ import org.jboss.osgi.resolver.XResource;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public interface ProvisionService {
+public interface XResourceProvisioner {
     
     XResolver getResolver();
     

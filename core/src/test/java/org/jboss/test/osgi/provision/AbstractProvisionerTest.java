@@ -30,10 +30,10 @@ import org.jboss.osgi.framework.Constants;
 import org.jboss.osgi.framework.spi.SystemPaths;
 import org.jboss.osgi.metadata.OSGiMetaData;
 import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
-import org.jboss.osgi.provision.AbstractProvisionService;
+import org.jboss.osgi.provision.AbstractResourceProvisioner;
 import org.jboss.osgi.provision.ProvisionException;
 import org.jboss.osgi.provision.ProvisionResult;
-import org.jboss.osgi.provision.ProvisionService;
+import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.repository.RepositoryReader;
 import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryXMLReader;
@@ -58,10 +58,10 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public abstract class AbstractProvisionTest {
+public abstract class AbstractProvisionerTest {
 
     XPersistentRepository repository;
-    ProvisionService provisionService;
+    XResourceProvisioner provisionService;
     XEnvironment environment;
 
     @Before
@@ -69,7 +69,7 @@ public abstract class AbstractProvisionTest {
         environment = new AbstractEnvironment();
         XResolver resolver = new AbstractResolver();
         repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenDelegateRepository());
-        provisionService = new AbstractProvisionService(resolver, repository) {
+        provisionService = new AbstractResourceProvisioner(resolver, repository) {
             @Override
             public <T> List<T> installResources(List<XResource> resources) throws ProvisionException {
                 XResource[] resarr = new XResource[resources.size()];
@@ -79,7 +79,7 @@ public abstract class AbstractProvisionTest {
         };
     }
 
-    ProvisionService getProvisionService() {
+    XResourceProvisioner getProvisioner() {
         return provisionService;
     }
 
@@ -92,11 +92,11 @@ public abstract class AbstractProvisionTest {
     }
 
     ProvisionResult findResources(Set<XRequirement> reqs) {
-        return getProvisionService().findResources(getEnvironment(), reqs);
+        return getProvisioner().findResources(getEnvironment(), reqs);
     }
     
     <T> List<T> installResources(ProvisionResult result) throws ProvisionException {
-        return getProvisionService().installResources(result.getResources());
+        return getProvisioner().installResources(result.getResources());
     }
     
     void setupFrameworkEnvironment() {
