@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,7 +58,7 @@ import org.osgi.service.resolver.ResolutionException;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public class AbstractResourceProvisioner implements XResourceProvisioner {
+public class AbstractResourceProvisioner<T> implements XResourceProvisioner<T> {
 
     private final XResolver resolver;
     private final XPersistentRepository repository;
@@ -79,7 +79,7 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
     }
 
     @Override
-    public <T> List<T> installResources(List<XResource> resources) throws ProvisionException {
+    public List<T> installResources(List<XResource> resources) throws ProvisionException {
         throw new UnsupportedOperationException();
     }
 
@@ -143,13 +143,13 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
                 LOGGER.debugf(" %s found in environment", req);
                 continue;
             }
-            
+
             Collection<Capability> providers = repository.findProviders(req);
             if (providers.size() == 1) {
                 XIdentityCapability icap = (XIdentityCapability) providers.iterator().next();
                 LOGGER.debugf(" %s found one: %s", req, icap);
                 installable.add(icap.getResource());
-                
+
             } else if (providers.size() > 1) {
                 List<XIdentityCapability> sorted = new ArrayList<XIdentityCapability>();
                 for (Capability cap : providers) {
@@ -170,8 +170,8 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
             } else {
                 LOGGER.debugf(" %s not found", req);
             }
-            
-            // Remove an unsatisfied maven requirement 
+
+            // Remove an unsatisfied maven requirement
             if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(req.getNamespace()))
                 itun.remove();
         }

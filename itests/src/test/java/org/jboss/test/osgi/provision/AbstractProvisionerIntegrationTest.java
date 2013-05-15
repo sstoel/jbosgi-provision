@@ -8,9 +8,9 @@ package org.jboss.test.osgi.provision;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,12 +50,12 @@ public abstract class AbstractProvisionerIntegrationTest {
 
     @ArquillianResource
     BundleContext context;
-    
+
     @Before
     public void setUp () throws Exception {
         initializeRepository();
     }
-    
+
     void initializeRepository() throws Exception {
         // remove all resources
         RepositoryStorage storage = getRepository().getRepositoryStorage();
@@ -74,7 +74,7 @@ public abstract class AbstractProvisionerIntegrationTest {
             resource = reader.nextResource();
         }
     }
-    
+
     XEnvironment getEnvironment() {
         ServiceReference<XEnvironment> sref = context.getServiceReference(XEnvironment.class);
         return sref != null ? context.getService(sref) : null;
@@ -85,17 +85,18 @@ public abstract class AbstractProvisionerIntegrationTest {
         return (XPersistentRepository) (sref != null ? context.getService(sref) : null);
     }
 
-    XResourceProvisioner getProvisionService() {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    XResourceProvisioner<Bundle> getProvisionService() {
         ServiceReference<XResourceProvisioner> sref = context.getServiceReference(XResourceProvisioner.class);
-        return sref != null ? context.getService(sref) : null;
+        return (sref != null ? context.getService(sref) : null);
     }
 
     ProvisionResult findResources(Set<XRequirement> reqs) {
         return getProvisionService().findResources(getEnvironment(), reqs);
     }
-    
+
     List<Bundle> installResources(ProvisionResult result) throws ProvisionException {
         return getProvisionService().installResources(result.getResources());
     }
-    
+
 }

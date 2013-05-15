@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,7 +56,7 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
 
     @Test
     public void testEmptyRepository() {
-        XResourceProvisioner provision = getProvisioner();
+        XResourceProvisioner<Void> provision = getProvisioner();
         XPersistentRepository repository = provision.getRepository();
         RepositoryStorage storage = repository.getRepositoryStorage();
         XResource resource = storage.getRepositoryReader().nextResource();
@@ -148,16 +148,16 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
         Assert.assertEquals(res2, result.getResources().iterator().next());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
     }
-    
+
     @Test
     public void testMavenCoordinates() throws Exception {
 
         MavenCoordinates mavenid = MavenCoordinates.parse("org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
 
-        XResourceProvisioner provisionService = getProvisioner();
+        XResourceProvisioner<Void> provisionService = getProvisioner();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
-        Assert.assertEquals("One resource", 1, result.getResources().size()); 
+        Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
     }
 }

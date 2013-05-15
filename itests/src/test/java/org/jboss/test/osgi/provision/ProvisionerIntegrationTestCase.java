@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,9 +55,9 @@ import org.osgi.service.repository.Repository;
 @RunWith(Arquillian.class)
 public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrationTest {
 
-    @ArquillianResource 
+    @ArquillianResource
     BundleContext context;
-    
+
     @Deployment
     public static JavaArchive createdeployment() {
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "provision-tests");
@@ -84,29 +84,29 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
         XRequirement req = XRequirementBuilder.create(mvnid).getRequirement();
         Assert.assertNotNull("Requirement not null", req);
 
-        XResourceProvisioner provisionService = getProvisionService();
+        XResourceProvisioner<Bundle> provisionService = getProvisionService();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
-        Assert.assertEquals("One resource", 1, result.getResources().size()); 
+        Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
-        
+
         List<Bundle> bundles = provisionService.installResources(result.getResources());
-        Assert.assertEquals("One bundle", 1, bundles.size()); 
+        Assert.assertEquals("One bundle", 1, bundles.size());
         Bundle bundle = bundles.get(0);
         try {
-            Assert.assertEquals("org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec", bundle.getSymbolicName()); 
-            Assert.assertEquals(Version.parseVersion("1.0.1.Final"), bundle.getVersion()); 
+            Assert.assertEquals("org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec", bundle.getSymbolicName());
+            Assert.assertEquals(Version.parseVersion("1.0.1.Final"), bundle.getVersion());
         } finally {
             bundle.uninstall();
         }
     }
-    
+
     @Test
     public void testAbstractFeature() throws Exception {
         XRequirementBuilder reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "felix.eventadmin.feature");
         ProvisionResult result = findResources(Collections.singleton(reqbuilder.getRequirement()));
         Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
-        
+
         List<Bundle> bundles = installResources(result);
         Assert.assertEquals("One bundle", 1, bundles.size());
 

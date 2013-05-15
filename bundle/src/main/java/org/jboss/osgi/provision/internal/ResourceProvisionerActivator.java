@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,8 @@ package org.jboss.osgi.provision.internal;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -52,6 +54,8 @@ public class ResourceProvisionerActivator implements BundleActivator {
     private final AtomicLong installIndex = new AtomicLong();
     private ServiceTracker<XResolver, XResolver> resolverTracker;
     private ServiceTracker<XRepository, XPersistentRepository> repositoryTracker;
+
+    @SuppressWarnings("rawtypes")
     private ServiceRegistration<XResourceProvisioner> registration;
 
     @Override
@@ -73,10 +77,10 @@ public class ResourceProvisionerActivator implements BundleActivator {
                 return repository;
             }
         };
-        
+
         resolverTracker.open();
         repositoryTracker.open();
-    } 
+    }
 
     @Override
     public void stop(BundleContext context) throws Exception {
@@ -90,18 +94,17 @@ public class ResourceProvisionerActivator implements BundleActivator {
 
     private void createProvisionService(final BundleContext context, final XResolver resolver, final XPersistentRepository repository) {
         if (resolver != null && repository != null) {
-            XResourceProvisioner service = new AbstractResourceProvisioner(resolver, repository) {
+            XResourceProvisioner<Bundle> service = new AbstractResourceProvisioner<Bundle>(resolver, repository) {
                 @Override
-                @SuppressWarnings("unchecked")
-                public <T> List<T> installResources(List<XResource> resources) throws ProvisionException {
+                public List<Bundle> installResources(List<XResource> resources) throws ProvisionException {
                     String locationBase = context.getBundle().getLocation();
-                    List<T> result = new ArrayList<T>();
+                    List<Bundle> result = new ArrayList<Bundle>();
                     for (XResource res : resources) {
                         try {
                             String location = locationBase + "/resource" + installIndex.incrementAndGet();
                             InputStream input = ((RepositoryContent) res).getContent();
                             Bundle bundle = context.installBundle(location, input);
-                            result.add((T) bundle);
+                            result.add(bundle);
                         } catch (BundleException ex) {
                             throw new ProvisionException(ex);
                         }
@@ -109,7 +112,9 @@ public class ResourceProvisionerActivator implements BundleActivator {
                     return Collections.unmodifiableList(result);
                 }
             };
-            registration = context.registerService(XResourceProvisioner.class, service, null);
+            Dictionary<String, String> props = new Hashtable<String, String>();
+            props.put("type", XResource.TYPE_BUNDLE);
+            registration = context.registerService(XResourceProvisioner.class, service, props);
         }
     }
 }

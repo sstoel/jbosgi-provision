@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,7 +61,7 @@ import org.osgi.framework.Version;
 public abstract class AbstractProvisionerTest {
 
     XPersistentRepository repository;
-    XResourceProvisioner provisionService;
+    XResourceProvisioner<Void> provisionService;
     XEnvironment environment;
 
     @Before
@@ -69,9 +69,9 @@ public abstract class AbstractProvisionerTest {
         environment = new AbstractEnvironment();
         XResolver resolver = new AbstractResolver();
         repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenDelegateRepository());
-        provisionService = new AbstractResourceProvisioner(resolver, repository) {
+        provisionService = new AbstractResourceProvisioner<Void>(resolver, repository) {
             @Override
-            public <T> List<T> installResources(List<XResource> resources) throws ProvisionException {
+            public List<Void> installResources(List<XResource> resources) throws ProvisionException {
                 XResource[] resarr = new XResource[resources.size()];
                 environment.installResources(resources.toArray(resarr));
                 return Collections.emptyList();
@@ -79,7 +79,7 @@ public abstract class AbstractProvisionerTest {
         };
     }
 
-    XResourceProvisioner getProvisioner() {
+    XResourceProvisioner<Void> getProvisioner() {
         return provisionService;
     }
 
@@ -94,11 +94,11 @@ public abstract class AbstractProvisionerTest {
     ProvisionResult findResources(Set<XRequirement> reqs) {
         return getProvisioner().findResources(getEnvironment(), reqs);
     }
-    
-    <T> List<T> installResources(ProvisionResult result) throws ProvisionException {
+
+    List<Void> installResources(ProvisionResult result) throws ProvisionException {
         return getProvisioner().installResources(result.getResources());
     }
-    
+
     void setupFrameworkEnvironment() {
         OSGiMetaDataBuilder builder = OSGiMetaDataBuilder.createBuilder(Constants.SYSTEM_BUNDLE_SYMBOLICNAME, Version.emptyVersion);
         for (String packageSpec : SystemPaths.DEFAULT_SYSTEM_PACKAGES) {
@@ -122,7 +122,7 @@ public abstract class AbstractProvisionerTest {
             res = reader.nextResource();
         }
     }
-    
+
     RepositoryReader getRepositoryReader(String config) throws XMLStreamException {
         InputStream input = getClass().getClassLoader().getResourceAsStream(config);
         return RepositoryXMLReader.create(input);
