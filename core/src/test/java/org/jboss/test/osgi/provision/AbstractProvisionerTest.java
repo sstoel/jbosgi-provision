@@ -61,7 +61,7 @@ import org.osgi.framework.Version;
 public abstract class AbstractProvisionerTest {
 
     XPersistentRepository repository;
-    XResourceProvisioner<Void> provisionService;
+    XResourceProvisioner provisionService;
     XEnvironment environment;
 
     @Before
@@ -69,9 +69,9 @@ public abstract class AbstractProvisionerTest {
         environment = new AbstractEnvironment();
         XResolver resolver = new AbstractResolver();
         repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenDelegateRepository());
-        provisionService = new AbstractResourceProvisioner<Void>(resolver, repository) {
+        provisionService = new AbstractResourceProvisioner(resolver, repository, XResource.TYPE_BUNDLE) {
             @Override
-            public List<Void> installResources(List<XResource> resources) throws ProvisionException {
+            public <T> List<T> installResources(List<XResource> resources, Class<T> type) throws ProvisionException {
                 XResource[] resarr = new XResource[resources.size()];
                 environment.installResources(resources.toArray(resarr));
                 return Collections.emptyList();
@@ -79,7 +79,7 @@ public abstract class AbstractProvisionerTest {
         };
     }
 
-    XResourceProvisioner<Void> getProvisioner() {
+    XResourceProvisioner getProvisioner() {
         return provisionService;
     }
 
@@ -95,7 +95,7 @@ public abstract class AbstractProvisionerTest {
         return getProvisioner().findResources(getEnvironment(), reqs);
     }
 
-    List<Void> installResources(ProvisionResult result) throws ProvisionException {
+    List<Object> installResources(ProvisionResult result) throws ProvisionException {
         return getProvisioner().installResources(result.getResources());
     }
 

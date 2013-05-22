@@ -34,7 +34,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.osgi.repository.MavenResourceHandler;
 import org.jboss.osgi.repository.XPersistentRepository;
+import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XIdentityCapability;
 import org.jboss.osgi.resolver.XIdentityRequirement;
@@ -58,14 +61,16 @@ import org.osgi.service.resolver.ResolutionException;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public class AbstractResourceProvisioner<T> implements XResourceProvisioner<T> {
+public abstract class AbstractResourceProvisioner implements XResourceProvisioner {
 
     private final XResolver resolver;
     private final XPersistentRepository repository;
+    private final String targetType;
 
-    public AbstractResourceProvisioner(XResolver resolver, XPersistentRepository repository) {
+    public AbstractResourceProvisioner(XResolver resolver, XPersistentRepository repository, String targetType) {
         this.resolver = resolver;
         this.repository = repository;
+        this.targetType = targetType;
     }
 
     @Override
@@ -79,8 +84,8 @@ public class AbstractResourceProvisioner<T> implements XResourceProvisioner<T> {
     }
 
     @Override
-    public List<T> installResources(List<XResource> resources) throws ProvisionException {
-        throw new UnsupportedOperationException();
+    public List<Object> installResources(List<XResource> resources) throws ProvisionException {
+        return installResources(resources, Object.class);
     }
 
     @Override
@@ -126,65 +131,65 @@ public class AbstractResourceProvisioner<T> implements XResourceProvisioner<T> {
         return result;
     }
 
-    private void findResources(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied,
-            List<XResource> resources) {
+    private void findResources(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied, List<XResource> resources) {
 
         // Resolve the unsatisfied reqs in the environment
         resolveInEnvironment(env, unresolved, mapping, unstatisfied, resources);
         if (unstatisfied.isEmpty())
             return;
 
-        LOGGER.debugf("Finding unsatisfied reqs");
+        boolean envModified = false;
         Set<XResource> installable = new HashSet<XResource>();
+
+        LOGGER.debugf("Finding unsatisfied reqs");
+
         Iterator<XRequirement> itun = unstatisfied.iterator();
         while (itun.hasNext()) {
             XRequirement req = itun.next();
+
+            // Ignore requirements that are already in the environment
             if (!env.findProviders(req).isEmpty()) {
-                LOGGER.debugf(" %s found in environment", req);
                 continue;
             }
 
-            Collection<Capability> providers = repository.findProviders(req);
-            if (providers.size() == 1) {
-                XIdentityCapability icap = (XIdentityCapability) providers.iterator().next();
-                LOGGER.debugf(" %s found one: %s", req, icap);
-                installable.add(icap.getResource());
+            XIdentityCapability icap = findProviderInRepository(req);
+            if (icap != null) {
 
-            } else if (providers.size() > 1) {
-                List<XIdentityCapability> sorted = new ArrayList<XIdentityCapability>();
-                for (Capability cap : providers) {
-                    sorted.add((XIdentityCapability) cap);
-                }
-                Collections.sort(sorted, new Comparator<XIdentityCapability>() {
-                    @Override
-                    public int compare(XIdentityCapability cap1, XIdentityCapability cap2) {
-                        Version v1 = cap1.getVersion();
-                        Version v2 = cap2.getVersion();
-                        return v2.compareTo(v1);
+                // Convert a maven resource to it's associated target resource
+                String type = (String) icap.getAttribute(XResource.CAPABILITY_TYPE_ATTRIBUTE);
+                if (XResource.TYPE_ABSTRACT.equals(type)) {
+                    List<Requirement> mreqs = icap.getResource().getRequirements(XResource.MAVEN_IDENTITY_NAMESPACE);
+                    XRequirement mreq = (XRequirement) (mreqs.size() == 1 ? mreqs.get(0) : null);
+                    if (mreq != null) {
+                        XCapability mcap = (XCapability) repository.findProviders(mreq).iterator().next();
+                        MavenResourceHandler handler = new MavenResourceHandler();
+                        XResource res;
+                        if (XResource.TYPE_BUNDLE.equals(targetType)) {
+                            res = handler.toBundleResource(mcap.getResource());
+                        } else {
+                            String modspec = (String) mreq.getAttribute(XResource.MODULE_IDENTITY_NAMESPACE);
+                            if (modspec == null && XResource.MODULE_IDENTITY_NAMESPACE.equals(icap.getNamespace())) {
+                                modspec = (String) icap.getAttribute(XResource.MODULE_IDENTITY_NAMESPACE);
+                            }
+                            res = handler.toModuleResource(mcap.getResource(), ModuleIdentifier.fromString(modspec));
+                        }
+                        icap = res.getIdentityCapability();
                     }
-                });
+                }
 
-                LOGGER.debugf(" %s found multiple: %s", req, sorted);
-                XIdentityCapability icap = sorted.get(0);
                 installable.add(icap.getResource());
-            } else {
-                LOGGER.debugf(" %s not found", req);
             }
-
-            // Remove an unsatisfied maven requirement
-            if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(req.getNamespace()))
-                itun.remove();
         }
 
         // The namespaces for nested requirements that are added to the unsattisfied requirements
-        String[] namespaces = new String[] { IdentityNamespace.IDENTITY_NAMESPACE, XResource.MAVEN_IDENTITY_NAMESPACE };
-        boolean envModified = false;
+        String[] namespaces = new String[] { IdentityNamespace.IDENTITY_NAMESPACE, XResource.MODULE_IDENTITY_NAMESPACE, XResource.MAVEN_IDENTITY_NAMESPACE };
 
         // Install the resources that match the unsatisfied reqs
         for (XResource res : installable) {
             if (!resources.contains(res)) {
-                LOGGER.debugf("Adding to resources: %s", res);
-                unstatisfied.addAll(getRequirements(res, namespaces));
+                Collection<XRequirement> reqs = getRequirements(res, namespaces);
+                LOGGER.debugf("Adding %d unsatisfied reqs", reqs.size());
+                unstatisfied.addAll(reqs);
                 env.installResources(res);
                 resources.add(res);
                 envModified = true;
@@ -195,6 +200,36 @@ public class AbstractResourceProvisioner<T> implements XResourceProvisioner<T> {
         if (envModified) {
             findResources(env, unresolved, mapping, unstatisfied, resources);
         }
+    }
+
+    private XIdentityCapability findProviderInRepository(XRequirement req) {
+
+        // Find the providers in the repository
+        Collection<Capability> providers = repository.findProviders(req);
+
+        XIdentityCapability icap = null;
+        if (providers.size() == 1) {
+            icap = (XIdentityCapability) providers.iterator().next();
+            LOGGER.debugf(" Found one: %s", icap);
+        } else if (providers.size() > 1) {
+            List<XIdentityCapability> sorted = new ArrayList<XIdentityCapability>();
+            for (Capability cap : providers) {
+                sorted.add((XIdentityCapability) cap);
+            }
+            Collections.sort(sorted, new Comparator<XIdentityCapability>() {
+                @Override
+                public int compare(XIdentityCapability cap1, XIdentityCapability cap2) {
+                    Version v1 = cap1.getVersion();
+                    Version v2 = cap2.getVersion();
+                    return v2.compareTo(v1);
+                }
+            });
+            LOGGER.debugf(" Found multiple: %s", sorted);
+            icap = sorted.get(0);
+        } else {
+            LOGGER.debugf(" Not found: %s", req);
+        }
+        return icap;
     }
 
     private Collection<XRequirement> getRequirements(XResource res, String... namespaces) {

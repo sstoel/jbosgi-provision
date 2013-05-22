@@ -85,8 +85,7 @@ public abstract class AbstractProvisionerIntegrationTest {
         return (XPersistentRepository) (sref != null ? context.getService(sref) : null);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    XResourceProvisioner<Bundle> getProvisionService() {
+    XResourceProvisioner getProvisionService() {
         ServiceReference<XResourceProvisioner> sref = context.getServiceReference(XResourceProvisioner.class);
         return (sref != null ? context.getService(sref) : null);
     }
@@ -96,7 +95,7 @@ public abstract class AbstractProvisionerIntegrationTest {
     }
 
     List<Bundle> installResources(ProvisionResult result) throws ProvisionException {
-        return getProvisionService().installResources(result.getResources());
+        return getProvisionService().installResources(result.getResources(), Bundle.class);
     }
 
 }

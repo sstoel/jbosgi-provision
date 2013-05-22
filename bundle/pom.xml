@@ -108,6 +108,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.jboss.logging;version="[3.0,4.0)",
+                            org.jboss.modules;version="[1.2,2.0)",
                             org.jboss.osgi.resolver;version="[4.0,5.0)",
                             org.jboss.osgi.resolver.spi;version="[4.0,5.0)",
                             org.jboss.osgi.repository;version="[3.0,4.0)",

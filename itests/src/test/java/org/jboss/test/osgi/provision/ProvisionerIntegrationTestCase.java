@@ -84,12 +84,12 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
         XRequirement req = XRequirementBuilder.create(mvnid).getRequirement();
         Assert.assertNotNull("Requirement not null", req);
 
-        XResourceProvisioner<Bundle> provisionService = getProvisionService();
+        XResourceProvisioner provisionService = getProvisionService();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
         Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
 
-        List<Bundle> bundles = provisionService.installResources(result.getResources());
+        List<Bundle> bundles = provisionService.installResources(result.getResources(), Bundle.class);
         Assert.assertEquals("One bundle", 1, bundles.size());
         Bundle bundle = bundles.get(0);
         try {

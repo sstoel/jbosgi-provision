@@ -56,7 +56,7 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
 
     @Test
     public void testEmptyRepository() {
-        XResourceProvisioner<Void> provision = getProvisioner();
+        XResourceProvisioner provision = getProvisioner();
         XPersistentRepository repository = provision.getRepository();
         RepositoryStorage storage = repository.getRepositoryStorage();
         XResource resource = storage.getRepositoryReader().nextResource();
@@ -155,7 +155,7 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
         MavenCoordinates mavenid = MavenCoordinates.parse("org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
 
-        XResourceProvisioner<Void> provisionService = getProvisioner();
+        XResourceProvisioner provisionService = getProvisioner();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
         Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());

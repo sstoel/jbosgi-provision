@@ -34,7 +34,7 @@ import org.jboss.osgi.resolver.XResource;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public interface XResourceProvisioner<T> {
+public interface XResourceProvisioner {
 
     XResolver getResolver();
 
@@ -42,5 +42,7 @@ public interface XResourceProvisioner<T> {
 
     ProvisionResult findResources(XEnvironment env, Set<XRequirement> reqs);
 
-    List<T> installResources(List<XResource> resources) throws ProvisionException;
+    List<Object> installResources(List<XResource> resources) throws ProvisionException;
+
+    <T> List<T> installResources(List<XResource> resources, Class<T> type) throws ProvisionException;
 }

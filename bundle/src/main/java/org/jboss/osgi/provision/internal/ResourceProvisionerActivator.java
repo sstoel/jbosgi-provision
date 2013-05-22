@@ -54,8 +54,6 @@ public class ResourceProvisionerActivator implements BundleActivator {
     private final AtomicLong installIndex = new AtomicLong();
     private ServiceTracker<XResolver, XResolver> resolverTracker;
     private ServiceTracker<XRepository, XPersistentRepository> repositoryTracker;
-
-    @SuppressWarnings("rawtypes")
     private ServiceRegistration<XResourceProvisioner> registration;
 
     @Override
@@ -94,17 +92,18 @@ public class ResourceProvisionerActivator implements BundleActivator {
 
     private void createProvisionService(final BundleContext context, final XResolver resolver, final XPersistentRepository repository) {
         if (resolver != null && repository != null) {
-            XResourceProvisioner<Bundle> service = new AbstractResourceProvisioner<Bundle>(resolver, repository) {
+            XResourceProvisioner service = new AbstractResourceProvisioner(resolver, repository, XResource.TYPE_BUNDLE) {
                 @Override
-                public List<Bundle> installResources(List<XResource> resources) throws ProvisionException {
+                @SuppressWarnings("unchecked")
+                public <T> List<T> installResources(List<XResource> resources, Class<T> type) throws ProvisionException {
                     String locationBase = context.getBundle().getLocation();
-                    List<Bundle> result = new ArrayList<Bundle>();
+                    List<T> result = new ArrayList<T>();
                     for (XResource res : resources) {
                         try {
                             String location = locationBase + "/resource" + installIndex.incrementAndGet();
                             InputStream input = ((RepositoryContent) res).getContent();
                             Bundle bundle = context.installBundle(location, input);
-                            result.add(bundle);
+                            result.add((T)bundle);
                         } catch (BundleException ex) {
                             throw new ProvisionException(ex);
                         }
