@@ -35,7 +35,7 @@
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>1.0.0.CR4-SNAPSHOT</version>
+        <version>1.0.0.Final</version>
     </parent>
 
     <!-- Dependencies -->
