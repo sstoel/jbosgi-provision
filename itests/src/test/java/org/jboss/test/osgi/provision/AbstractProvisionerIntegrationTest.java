@@ -20,8 +20,10 @@ package org.jboss.test.osgi.provision;
  */
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.osgi.provision.ProvisionException;
@@ -38,7 +40,9 @@ import org.jboss.osgi.resolver.XResource;
 import org.junit.Before;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.repository.RepositoryContent;
 
 /**
  * Test provision service access
@@ -47,6 +51,8 @@ import org.osgi.framework.ServiceReference;
  * @since 07-May-2013
  */
 public abstract class AbstractProvisionerIntegrationTest {
+
+    private final AtomicLong installIndex = new AtomicLong();
 
     @ArquillianResource
     BundleContext context;
@@ -94,8 +100,18 @@ public abstract class AbstractProvisionerIntegrationTest {
         return getProvisionService().findResources(getEnvironment(), reqs);
     }
 
-    List<Bundle> installResources(ProvisionResult result) throws ProvisionException {
-        return getProvisionService().installResources(result.getResources(), Bundle.class);
+    List<Bundle> installResources(List<XResource> resources) throws ProvisionException {
+        List<Bundle> result = new ArrayList<Bundle>();
+        for (XResource res : resources) {
+            try {
+                String location = "resource" + installIndex.incrementAndGet();
+                InputStream input = ((RepositoryContent) res).getContent();
+                Bundle bundle = context.installBundle(location, input);
+                result.add(bundle);
+            } catch (BundleException ex) {
+                throw new ProvisionException(ex);
+            }
+        }
+        return result;
     }
-
 }

@@ -19,28 +19,18 @@
  */
 package org.jboss.osgi.provision.internal;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.jboss.osgi.provision.AbstractResourceProvisioner;
-import org.jboss.osgi.provision.ProvisionException;
 import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XResolver;
 import org.jboss.osgi.resolver.XResource;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.repository.RepositoryContent;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -51,7 +41,6 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class ResourceProvisionerActivator implements BundleActivator {
 
-    private final AtomicLong installIndex = new AtomicLong();
     private ServiceTracker<XResolver, XResolver> resolverTracker;
     private ServiceTracker<XRepository, XPersistentRepository> repositoryTracker;
     private ServiceRegistration<XResourceProvisioner> registration;
@@ -92,25 +81,7 @@ public class ResourceProvisionerActivator implements BundleActivator {
 
     private void createProvisionService(final BundleContext context, final XResolver resolver, final XPersistentRepository repository) {
         if (resolver != null && repository != null) {
-            XResourceProvisioner service = new AbstractResourceProvisioner(resolver, repository, XResource.TYPE_BUNDLE) {
-                @Override
-                @SuppressWarnings("unchecked")
-                public <T> List<T> installResources(List<XResource> resources, Class<T> type) throws ProvisionException {
-                    String locationBase = context.getBundle().getLocation();
-                    List<T> result = new ArrayList<T>();
-                    for (XResource res : resources) {
-                        try {
-                            String location = locationBase + "/resource" + installIndex.incrementAndGet();
-                            InputStream input = ((RepositoryContent) res).getContent();
-                            Bundle bundle = context.installBundle(location, input);
-                            result.add((T)bundle);
-                        } catch (BundleException ex) {
-                            throw new ProvisionException(ex);
-                        }
-                    }
-                    return Collections.unmodifiableList(result);
-                }
-            };
+            XResourceProvisioner service = new AbstractResourceProvisioner(resolver, repository);
             Dictionary<String, String> props = new Hashtable<String, String>();
             props.put("type", XResource.TYPE_BUNDLE);
             registration = context.registerService(XResourceProvisioner.class, service, props);

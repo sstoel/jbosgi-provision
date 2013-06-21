@@ -89,7 +89,7 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
         Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
 
-        List<Bundle> bundles = provisionService.installResources(result.getResources(), Bundle.class);
+        List<Bundle> bundles = installResources(result.getResources());
         Assert.assertEquals("One bundle", 1, bundles.size());
         Bundle bundle = bundles.get(0);
         try {
@@ -107,7 +107,7 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
         Assert.assertEquals("One resource", 1, result.getResources().size());
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
 
-        List<Bundle> bundles = installResources(result);
+        List<Bundle> bundles = installResources(result.getResources());
         Assert.assertEquals("One bundle", 1, bundles.size());
 
         // Verify that we can now access the installed resource directly

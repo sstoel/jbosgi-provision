@@ -19,14 +19,12 @@
  */
 package org.jboss.osgi.provision;
 
-import java.util.List;
 import java.util.Set;
 
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResolver;
-import org.jboss.osgi.resolver.XResource;
 
 /**
  * The Provision Service
@@ -41,8 +39,4 @@ public interface XResourceProvisioner {
     XPersistentRepository getRepository();
 
     ProvisionResult findResources(XEnvironment env, Set<XRequirement> reqs);
-
-    List<Object> installResources(List<XResource> resources) throws ProvisionException;
-
-    <T> List<T> installResources(List<XResource> resources, Class<T> type) throws ProvisionException;
 }

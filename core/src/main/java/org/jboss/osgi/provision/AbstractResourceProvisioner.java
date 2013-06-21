@@ -34,8 +34,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.jboss.modules.ModuleIdentifier;
-import org.jboss.osgi.repository.MavenResourceHandler;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XEnvironment;
@@ -61,16 +59,14 @@ import org.osgi.service.resolver.ResolutionException;
  * @author thomas.diesler@jboss.com
  * @since 06-May-2013
  */
-public abstract class AbstractResourceProvisioner implements XResourceProvisioner {
+public class AbstractResourceProvisioner implements XResourceProvisioner {
 
     private final XResolver resolver;
     private final XPersistentRepository repository;
-    private final String targetType;
 
-    public AbstractResourceProvisioner(XResolver resolver, XPersistentRepository repository, String targetType) {
+    public AbstractResourceProvisioner(XResolver resolver, XPersistentRepository repository) {
         this.resolver = resolver;
         this.repository = repository;
-        this.targetType = targetType;
     }
 
     @Override
@@ -81,11 +77,6 @@ public abstract class AbstractResourceProvisioner implements XResourceProvisione
     @Override
     public final XPersistentRepository getRepository() {
         return repository;
-    }
-
-    @Override
-    public List<Object> installResources(List<XResource> resources) throws ProvisionException {
-        return installResources(resources, Object.class);
     }
 
     @Override
@@ -128,6 +119,17 @@ public abstract class AbstractResourceProvisioner implements XResourceProvisione
         LOGGER.debugf("  resources: %s", result.getResources());
         LOGGER.debugf("  unsatisfied: %s", result.getUnsatisfiedRequirements());
 
+        List<XResource> mandatory = new ArrayList<XResource>();
+        mandatory.addAll(resources);
+        try {
+            XResolveContext context = resolver.createResolveContext(env, mandatory, null);
+            resolver.resolve(context).entrySet();
+        } catch (ResolutionException ex) {
+            for (Requirement req : ex.getUnresolvedRequirements()) {
+                LOGGER.debugf(" unresolved: %s", req);
+            }
+        }
+
         return result;
     }
 
@@ -146,39 +148,42 @@ public abstract class AbstractResourceProvisioner implements XResourceProvisione
         Iterator<XRequirement> itun = unstatisfied.iterator();
         while (itun.hasNext()) {
             XRequirement req = itun.next();
+            String reqnamespace = req.getNamespace();
 
             // Ignore requirements that are already in the environment
             if (!env.findProviders(req).isEmpty()) {
                 continue;
             }
 
+            // Continue if we cannot find a provider for a given requirement
             XIdentityCapability icap = findProviderInRepository(req);
-            if (icap != null) {
+            if (icap == null) {
+                continue;
+            }
 
-                // Convert a maven resource to it's associated target resource
-                String type = (String) icap.getAttribute(XResource.CAPABILITY_TYPE_ATTRIBUTE);
-                if (XResource.TYPE_ABSTRACT.equals(type)) {
-                    List<Requirement> mreqs = icap.getResource().getRequirements(XResource.MAVEN_IDENTITY_NAMESPACE);
-                    XRequirement mreq = (XRequirement) (mreqs.size() == 1 ? mreqs.get(0) : null);
-                    if (mreq != null) {
-                        XCapability mcap = (XCapability) repository.findProviders(mreq).iterator().next();
-                        MavenResourceHandler handler = new MavenResourceHandler();
-                        XResource res;
-                        if (XResource.TYPE_BUNDLE.equals(targetType)) {
-                            res = handler.toBundleResource(mcap.getResource());
-                        } else {
-                            String modspec = (String) mreq.getAttribute(XResource.MODULE_IDENTITY_NAMESPACE);
-                            if (modspec == null && XResource.MODULE_IDENTITY_NAMESPACE.equals(icap.getNamespace())) {
-                                modspec = (String) icap.getAttribute(XResource.MODULE_IDENTITY_NAMESPACE);
-                            }
-                            res = handler.toModuleResource(mcap.getResource(), ModuleIdentifier.fromString(modspec));
-                        }
-                        icap = res.getIdentityCapability();
-                    }
+            // Convert a maven resource to it's associated target resource
+            String icaptype = (String) icap.getAttribute(XResource.CAPABILITY_TYPE_ATTRIBUTE);
+            if (XResource.TYPE_ABSTRACT.equals(icaptype)) {
+                if (getRequirementDelegate(icap, XResource.MAVEN_IDENTITY_NAMESPACE) != null) {
+                    XRequirement mreq = getRequirementDelegate(icap, XResource.MAVEN_IDENTITY_NAMESPACE);
+                    XCapability mcap = (XCapability) repository.findProviders(mreq).iterator().next();
+                    icap = mcap.getResource().getIdentityCapability();
+                } else if (getRequirementDelegate(icap, XResource.MODULE_IDENTITY_NAMESPACE) != null) {
+                    XRequirement mreq = getRequirementDelegate(icap, XResource.MODULE_IDENTITY_NAMESPACE);
+                    XCapability mcap = (XCapability) repository.findProviders(mreq).iterator().next();
+                    icap = mcap.getResource().getIdentityCapability();
                 }
 
-                installable.add(icap.getResource());
+                // Remove the abstract requirement
+                itun.remove();
+
+            } else if (XResource.MAVEN_IDENTITY_NAMESPACE.equals(reqnamespace)) {
+
+                // Remove the maven requirement
+                itun.remove();
             }
+
+            installable.add(icap.getResource());
         }
 
         // The namespaces for nested requirements that are added to the unsattisfied requirements
@@ -200,6 +205,11 @@ public abstract class AbstractResourceProvisioner implements XResourceProvisione
         if (envModified) {
             findResources(env, unresolved, mapping, unstatisfied, resources);
         }
+    }
+
+    public XRequirement getRequirementDelegate(XIdentityCapability icap, String namespace) {
+        List<Requirement> mreqs = icap.getResource().getRequirements(namespace);
+        return (XRequirement) (mreqs.size() == 1 ? mreqs.get(0) : null);
     }
 
     private XIdentityCapability findProviderInRepository(XRequirement req) {

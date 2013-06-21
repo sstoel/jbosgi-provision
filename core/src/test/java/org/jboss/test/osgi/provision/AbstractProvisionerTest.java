@@ -20,9 +20,9 @@
 package org.jboss.test.osgi.provision;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -39,7 +39,7 @@ import org.jboss.osgi.repository.RepositoryStorage;
 import org.jboss.osgi.repository.RepositoryXMLReader;
 import org.jboss.osgi.repository.XPersistentRepository;
 import org.jboss.osgi.repository.spi.AbstractPersistentRepository;
-import org.jboss.osgi.repository.spi.MavenDelegateRepository;
+import org.jboss.osgi.repository.spi.MavenIdentityRepository;
 import org.jboss.osgi.repository.spi.MemoryRepositoryStorage;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XRequirement;
@@ -60,6 +60,7 @@ import org.osgi.framework.Version;
  */
 public abstract class AbstractProvisionerTest {
 
+    AtomicLong installIndex = new AtomicLong();
     XPersistentRepository repository;
     XResourceProvisioner provisionService;
     XEnvironment environment;
@@ -68,15 +69,8 @@ public abstract class AbstractProvisionerTest {
     public void setUp() throws Exception {
         environment = new AbstractEnvironment();
         XResolver resolver = new AbstractResolver();
-        repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenDelegateRepository());
-        provisionService = new AbstractResourceProvisioner(resolver, repository, XResource.TYPE_BUNDLE) {
-            @Override
-            public <T> List<T> installResources(List<XResource> resources, Class<T> type) throws ProvisionException {
-                XResource[] resarr = new XResource[resources.size()];
-                environment.installResources(resources.toArray(resarr));
-                return Collections.emptyList();
-            }
-        };
+        repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenIdentityRepository());
+        provisionService = new AbstractResourceProvisioner(resolver, repository);
     }
 
     XResourceProvisioner getProvisioner() {
@@ -95,8 +89,10 @@ public abstract class AbstractProvisionerTest {
         return getProvisioner().findResources(getEnvironment(), reqs);
     }
 
-    List<Object> installResources(ProvisionResult result) throws ProvisionException {
-        return getProvisioner().installResources(result.getResources());
+    void installResources(List<XResource> resources) throws ProvisionException {
+        for (XResource res : resources) {
+            environment.installResources(res);
+        }
     }
 
     void setupFrameworkEnvironment() {
