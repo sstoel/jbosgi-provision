@@ -21,7 +21,7 @@ package org.jboss.osgi.provision;
 
 import java.util.Set;
 
-import org.jboss.osgi.repository.XPersistentRepository;
+import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResolver;
@@ -36,7 +36,7 @@ public interface XResourceProvisioner {
 
     XResolver getResolver();
 
-    XPersistentRepository getRepository();
+    XRepository getRepository();
 
     ProvisionResult findResources(XEnvironment env, Set<XRequirement> reqs);
 }

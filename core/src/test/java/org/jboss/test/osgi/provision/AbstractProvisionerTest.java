@@ -69,7 +69,8 @@ public abstract class AbstractProvisionerTest {
     public void setUp() throws Exception {
         environment = new AbstractEnvironment();
         XResolver resolver = new AbstractResolver();
-        repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory(), new MavenIdentityRepository());
+        repository = new AbstractPersistentRepository(new MemoryRepositoryStorage.Factory());
+        repository.addRepositoryDelegate(new MavenIdentityRepository());
         provisionService = new AbstractResourceProvisioner(resolver, repository);
     }
 
@@ -110,7 +111,7 @@ public abstract class AbstractProvisionerTest {
     }
 
     void setupRepository(String config) throws XMLStreamException {
-        RepositoryStorage storage = repository.getRepositoryStorage();
+        RepositoryStorage storage = getRepository().adapt(RepositoryStorage.class);
         RepositoryReader reader = getRepositoryReader(config);
         XResource res = reader.nextResource();
         while (res != null) {

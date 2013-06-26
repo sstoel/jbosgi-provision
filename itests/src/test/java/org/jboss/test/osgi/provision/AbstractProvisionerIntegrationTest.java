@@ -64,7 +64,7 @@ public abstract class AbstractProvisionerIntegrationTest {
 
     void initializeRepository() throws Exception {
         // remove all resources
-        RepositoryStorage storage = getRepository().getRepositoryStorage();
+        RepositoryStorage storage = getRepository().adapt(RepositoryStorage.class);
         RepositoryReader reader = storage.getRepositoryReader();
         XResource resource = reader.nextResource();
         while (resource != null) {

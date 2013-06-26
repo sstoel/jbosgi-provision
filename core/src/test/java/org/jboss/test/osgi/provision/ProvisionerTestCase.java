@@ -27,7 +27,7 @@ import junit.framework.Assert;
 import org.jboss.osgi.provision.ProvisionResult;
 import org.jboss.osgi.provision.XResourceProvisioner;
 import org.jboss.osgi.repository.RepositoryStorage;
-import org.jboss.osgi.repository.XPersistentRepository;
+import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.MavenCoordinates;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XRequirement;
@@ -57,8 +57,8 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
     @Test
     public void testEmptyRepository() {
         XResourceProvisioner provision = getProvisioner();
-        XPersistentRepository repository = provision.getRepository();
-        RepositoryStorage storage = repository.getRepositoryStorage();
+        XRepository repository = provision.getRepository();
+        RepositoryStorage storage = repository.adapt(RepositoryStorage.class);
         XResource resource = storage.getRepositoryReader().nextResource();
         Assert.assertNull("Empty repository", resource);
     }
@@ -84,8 +84,8 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
         XResourceBuilder<XResource> cbuilder = XResourceBuilderFactory.create();
         cbuilder.addCapability(IdentityNamespace.IDENTITY_NAMESPACE, "res1");
         XResource res = cbuilder.getResource();
-        XPersistentRepository repository = getProvisioner().getRepository();
-        RepositoryStorage storage = repository.getRepositoryStorage();
+        XRepository repository = getProvisioner().getRepository();
+        RepositoryStorage storage = repository.adapt(RepositoryStorage.class);
         storage.addResource(res);
 
         XRequirementBuilder rbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "res1");
@@ -110,8 +110,8 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
         cbuilder.addCapability(IdentityNamespace.IDENTITY_NAMESPACE, "res2");
         XResource res2 = cbuilder.getResource();
 
-        XPersistentRepository repository = getProvisioner().getRepository();
-        RepositoryStorage storage = repository.getRepositoryStorage();
+        XRepository repository = getProvisioner().getRepository();
+        RepositoryStorage storage = repository.adapt(RepositoryStorage.class);
         storage.addResource(res1);
         storage.addResource(res2);
 
@@ -134,8 +134,8 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
         cbuilder.addCapability(IdentityNamespace.IDENTITY_NAMESPACE, "res1").getAttributes().put("version", "2.0.0");
         XResource res2 = cbuilder.getResource();
 
-        XPersistentRepository repository = getProvisioner().getRepository();
-        RepositoryStorage storage = repository.getRepositoryStorage();
+        XRepository repository = getProvisioner().getRepository();
+        RepositoryStorage storage = repository.adapt(RepositoryStorage.class);
         storage.addResource(res1);
         storage.addResource(res2);
 
