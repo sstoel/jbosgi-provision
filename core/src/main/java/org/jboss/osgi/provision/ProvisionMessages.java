@@ -25,12 +25,10 @@ package org.jboss.osgi.provision;
 import java.util.Set;
 
 import org.jboss.logging.Messages;
-import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResource;
-import org.osgi.service.resolver.ResolutionException;
 
 /**
  * Logging Id ranges: 20350-20399
@@ -54,7 +52,4 @@ public interface ProvisionMessages {
 
     @Message(id = 20352, value = "Unsatisfied requirements: %s")
     IllegalStateException unsatiesfiedRequirements(Set<XRequirement> reqs);
-
-    @Message(id = 20353, value = "Cannot resolve provisioner result")
-    IllegalStateException cannotResolveResultResources(@Cause ResolutionException ex);
 }

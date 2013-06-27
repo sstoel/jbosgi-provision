@@ -21,6 +21,9 @@ package org.jboss.osgi.provision;
 
 import static org.jboss.osgi.provision.ProvisionLogger.LOGGER;
 import static org.jboss.osgi.provision.ProvisionMessages.MESSAGES;
+import static org.osgi.framework.namespace.PackageNamespace.RESOLUTION_DYNAMIC;
+import static org.osgi.framework.namespace.AbstractWiringNamespace.RESOLUTION_OPTIONAL;
+import static org.osgi.resource.Namespace.REQUIREMENT_RESOLUTION_DIRECTIVE;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +41,6 @@ import org.jboss.osgi.repository.XRepository;
 import org.jboss.osgi.resolver.XCapability;
 import org.jboss.osgi.resolver.XEnvironment;
 import org.jboss.osgi.resolver.XIdentityCapability;
-import org.jboss.osgi.resolver.XIdentityRequirement;
 import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XResolveContext;
 import org.jboss.osgi.resolver.XResolver;
@@ -46,7 +48,6 @@ import org.jboss.osgi.resolver.XResource;
 import org.jboss.osgi.resolver.XResource.State;
 import org.jboss.osgi.resolver.spi.AbstractEnvironment;
 import org.osgi.framework.Version;
-import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
@@ -120,15 +121,13 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
         LOGGER.debugf("  unsatisfied: %s", result.getUnsatisfiedRequirements());
 
         // Sanity check that we can resolve all result resources
-        if (result.getUnsatisfiedRequirements().isEmpty()) {
-            List<XResource> mandatory = new ArrayList<XResource>();
-            mandatory.addAll(resources);
-            try {
-                XResolveContext context = resolver.createResolveContext(envclone, mandatory, null);
-                resolver.resolve(context).entrySet();
-            } catch (ResolutionException ex) {
-                throw MESSAGES.cannotResolveResultResources(ex);
-            }
+        List<XResource> mandatory = new ArrayList<XResource>();
+        mandatory.addAll(resources);
+        try {
+            XResolveContext context = resolver.createResolveContext(envclone, mandatory, null);
+            resolver.resolve(context).entrySet();
+        } catch (ResolutionException ex) {
+            LOGGER.cannotResolveResultResources(ex);
         }
 
         return result;
@@ -189,13 +188,19 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
             installable.add(icap.getResource());
         }
 
-        // The namespaces for nested requirements that are added to the unsattisfied requirements
-        String[] namespaces = new String[] { IdentityNamespace.IDENTITY_NAMESPACE, XResource.MODULE_IDENTITY_NAMESPACE, XResource.MAVEN_IDENTITY_NAMESPACE };
-
         // Install the resources that match the unsatisfied reqs
         for (XResource res : installable) {
             if (!resources.contains(res)) {
-                Collection<XRequirement> reqs = getRequirements(res, namespaces);
+                Collection<XRequirement> reqs = getRequirements(res, null);
+                Iterator<XRequirement> itreqs = reqs.iterator();
+                while (itreqs.hasNext()) {
+                    XRequirement req = itreqs.next();
+                    boolean dynamic = RESOLUTION_DYNAMIC.equals(req.getDirective(REQUIREMENT_RESOLUTION_DIRECTIVE));
+                    boolean optional = RESOLUTION_OPTIONAL.equals(req.getDirective(REQUIREMENT_RESOLUTION_DIRECTIVE));
+                    if (dynamic || optional || env.findProviders(req).size() > 0) {
+                        itreqs.remove();
+                    }
+                }
                 LOGGER.debugf("Adding %d unsatisfied reqs", reqs.size());
                 unstatisfied.addAll(reqs);
                 env.installResources(res);
@@ -210,7 +215,23 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
         }
     }
 
-    public XRequirement getRequirementDelegate(XIdentityCapability icap, String namespace) {
+    private Collection<XRequirement> getRequirements(XResource res, String[] namespaces) {
+        Set<XRequirement> reqs = new HashSet<XRequirement>();
+        if (namespaces != null) {
+            for (String ns : namespaces) {
+                for (Requirement req : res.getRequirements(ns)) {
+                    reqs.add((XRequirement) req);
+                }
+            }
+        } else {
+            for (Requirement req : res.getRequirements(null)) {
+                reqs.add((XRequirement) req);
+            }
+        }
+        return reqs;
+    }
+
+    private XRequirement getRequirementDelegate(XIdentityCapability icap, String namespace) {
         List<Requirement> mreqs = icap.getResource().getRequirements(namespace);
         return (XRequirement) (mreqs.size() == 1 ? mreqs.get(0) : null);
     }
@@ -257,24 +278,7 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
         return cap;
     }
 
-    private Collection<XRequirement> getRequirements(XResource res, String... namespaces) {
-        Set<XRequirement> reqs = new HashSet<XRequirement>();
-        if (namespaces != null) {
-            for (String ns : namespaces) {
-                for (Requirement req : res.getRequirements(ns)) {
-                    reqs.add((XIdentityRequirement) req);
-                }
-            }
-        } else {
-            for (Requirement req : res.getRequirements(null)) {
-                reqs.add((XIdentityRequirement) req);
-            }
-        }
-        return reqs;
-    }
-
-    private void resolveInEnvironment(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied,
-            List<XResource> resources) {
+    private void resolveInEnvironment(XEnvironment env, List<XResource> unresolved, Map<XRequirement, XResource> mapping, Set<XRequirement> unstatisfied, List<XResource> resources) {
         List<XResource> mandatory = new ArrayList<XResource>();
         mandatory.addAll(unresolved);
         mandatory.addAll(resources);
@@ -289,11 +293,11 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
                         if (wire.getRequirement() == req) {
                             XResource provider = (XResource) wire.getProvider();
                             mapping.put(req, provider);
-                            itunsat.remove();
                         }
                     }
                 }
             }
+            unstatisfied.clear();
         } catch (ResolutionException ex) {
             for (Requirement req : ex.getUnresolvedRequirements()) {
                 LOGGER.debugf(" unresolved: %s", req);

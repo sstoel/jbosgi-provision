@@ -23,11 +23,14 @@
 package org.jboss.osgi.provision;
 
 import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.WARN;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.osgi.service.resolver.ResolutionException;
 
 /**
  * Logging Id ranges: 20300-20349
@@ -46,4 +49,8 @@ public interface ProvisionLogger extends BasicLogger {
     @LogMessage(level = INFO)
     @Message(id = 20300, value = "Activating Provision Subsystem")
     void infoActivatingSubsystem();
+
+    @LogMessage(level = WARN)
+    @Message(id = 20301, value = "Cannot resolve provisioner result")
+    void cannotResolveResultResources(@Cause ResolutionException ex);
 }

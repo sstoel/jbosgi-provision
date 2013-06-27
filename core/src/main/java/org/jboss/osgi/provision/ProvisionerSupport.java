@@ -26,7 +26,7 @@ import static org.jboss.osgi.provision.ProvisionLogger.LOGGER;
 import static org.jboss.osgi.provision.ProvisionMessages.MESSAGES;
 
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -138,14 +138,14 @@ public class ProvisionerSupport {
         return reshandles;
     }
 
-    public void populateRepository(String... features) throws IOException {
+    public void populateRepository(ClassLoader classLoader, String... features) throws IOException {
         if (features == null)
             throw MESSAGES.illegalArgumentNull("features");
 
         for (String feature : features) {
-            URL resourceURL = getResource(feature + ".xml");
-            if (resourceURL != null) {
-                RepositoryReader reader = RepositoryXMLReader.create(resourceURL.openStream());
+            InputStream input = getFeatureResource(classLoader, feature);
+            if (input != null) {
+                RepositoryReader reader = RepositoryXMLReader.create(input);
                 XResource auxres = reader.nextResource();
                 while (auxres != null) {
                     XIdentityCapability icap = auxres.getIdentityCapability();
@@ -161,7 +161,8 @@ public class ProvisionerSupport {
         }
     }
 
-    private URL getResource(String resname) {
-        return ProvisionerSupport.class.getResource("/repository/" + resname);
+    private InputStream getFeatureResource(ClassLoader classLoader, String feature) {
+        // [TODO] parameterize this
+        return classLoader.getResourceAsStream("/repository/" + feature  + ".xml");
     }
 }
