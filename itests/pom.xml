@@ -25,7 +25,8 @@
   -Djava.util.logging.manager=org.jboss.logmanager.LogManager
   -Dtest.archive.directory=${workspace_loc:jbosgi-provision-itests/target}/test-libs
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>JBossOSGi Provision: Integration Tests</name>
@@ -35,7 +36,7 @@
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>1.1.0.Beta2-SNAPSHOT</version>
+        <version>1.1.0.Final</version>
     </parent>
 
     <!-- Dependencies -->
@@ -62,10 +63,10 @@
             <artifactId>jbosgi-repository-bundle</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-osgi-embedded</artifactId>
+            <artifactId>arquillian-container-jbosgi-embedded</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -73,11 +74,11 @@
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.jboss.osgi.framework</groupId>
-			<artifactId>jbosgi-framework-core</artifactId>
+        <dependency>
+            <groupId>org.jboss.osgi.framework</groupId>
+            <artifactId>jbosgi-framework-core</artifactId>
             <scope>test</scope>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>org.jboss.osgi.testing</groupId>
             <artifactId>jbosgi-testing</artifactId>
@@ -88,31 +89,31 @@
             <artifactId>jboss-logmanager</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
     </dependencies>
 
     <build>
         <plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bundles</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>directory-single</goal>
-						</goals>
-						<configuration>
-							<finalName>test-libs</finalName>
-							<ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
-							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors>
-								<descriptor>scripts/assembly-bundles.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bundles</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>directory-single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>test-libs</finalName>
+                            <ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>scripts/assembly-bundles.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
