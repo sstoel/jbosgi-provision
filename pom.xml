@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>1.0.25</version>
+        <version>1.0.26-SNAPSHOT</version>
     </parent>
 
     <name>JBossOSGi Provision</name>
@@ -47,10 +47,10 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.osgi.framework>3.0.4.Final</version.jboss.osgi.framework>
-        <version.jboss.osgi.repository>4.0.0.Final</version.jboss.osgi.repository>
-        <version.jboss.osgi.resolver>4.0.2.Final</version.jboss.osgi.resolver>
-        <version.jboss.osgi.testing>2.0.1.Final</version.jboss.osgi.testing>
+        <version.jboss.osgi.framework>3.0.5.Final-SNAPSHOT</version.jboss.osgi.framework>
+        <version.jboss.osgi.repository>4.0.0.Final-SNAPSHOT</version.jboss.osgi.repository>
+        <version.jboss.osgi.resolver>4.0.3.Final-SNAPSHOT</version.jboss.osgi.resolver>
+        <version.jboss.osgi.testing>2.0.2.Final-SNAPSHOT</version.jboss.osgi.testing>
     </properties>
 
     <!-- Dependency Management -->
