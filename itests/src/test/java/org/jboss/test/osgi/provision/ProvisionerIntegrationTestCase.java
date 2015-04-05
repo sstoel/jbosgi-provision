@@ -108,18 +108,29 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
 
         List<Bundle> bundles = installResources(result.getResources());
-        Assert.assertEquals("One bundle", 1, bundles.size());
+        try {
+            Assert.assertEquals("One bundle", 1, bundles.size());
 
-        // Verify that we can now access the installed resource directly
-        reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "org.apache.felix.eventadmin");
-        result = findResources(Collections.singleton(reqbuilder.getRequirement()));
-        Assert.assertEquals("No resource", 0, result.getResources().size());
-        Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
+            // Verify that we can now access the installed resource directly
+            reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "org.apache.felix.eventadmin");
+            result = findResources(Collections.singleton(reqbuilder.getRequirement()));
+            Assert.assertEquals("No resource", 0, result.getResources().size());
+            Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
 
-        // Verify that we can require the feature again
-        reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "felix.eventadmin.feature");
-        result = findResources(Collections.singleton(reqbuilder.getRequirement()));
-        Assert.assertEquals("No resource", 0, result.getResources().size());
-        Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
+            // Verify that we can require the feature again
+            reqbuilder = XRequirementBuilder.create(IdentityNamespace.IDENTITY_NAMESPACE, "felix.eventadmin.feature");
+            result = findResources(Collections.singleton(reqbuilder.getRequirement()));
+            Assert.assertEquals("No resource", 0, result.getResources().size());
+            Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
+        }
+        finally {
+            for (Bundle b : bundles) {
+                try {
+                    b.uninstall();
+                }
+                catch (Exception e) {
+                }
+            }
+        }
     }
 }

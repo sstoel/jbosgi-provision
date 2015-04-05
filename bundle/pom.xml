@@ -19,13 +19,14 @@
   #L%
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>1.1.0.Beta2-SNAPSHOT</version>
+        <version>1.1.0.Final-SNAPSHOT</version>
     </parent>
 
     <name>JBossOSGi Provision: Bundle</name>
@@ -67,32 +68,39 @@
                 <executions>
                     <execution>
                         <phase>validate</phase>
-                        <goals><goal>parse-version</goal></goals>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
-                  <execution>
-                    <phase>validate</phase>
-                    <goals><goal>run</goal></goals>
-                    <configuration>
-                      <exportAntProperties>true</exportAntProperties>
-                      <target>
-                       <condition property="final.version">
-                          <matches string="${project.version}" pattern="(.*)Final" />
-                       </condition>
-                       <condition property="bundle.version" value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
-                          <isset property="final.version" />
-                       </condition>
-                       <condition property="bundle.version" value="${project.version}">
-                          <not><isset property="final.version" /></not>
-                       </condition>
-                       <echo message="bundle.version=${bundle.version}" />
-                      </target>
-                    </configuration>
-                  </execution>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <condition property="final.version">
+                                    <matches string="${project.version}" pattern="(.*)Final" />
+                                </condition>
+                                <condition property="bundle.version"
+                                    value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}">
+                                    <isset property="final.version" />
+                                </condition>
+                                <condition property="bundle.version" value="${project.version}">
+                                    <not>
+                                        <isset property="final.version" />
+                                    </not>
+                                </condition>
+                                <echo message="bundle.version=${bundle.version}" />
+                            </target>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -111,8 +119,8 @@
                             org.jboss.modules;version="[1.2,2.0)",
                             org.jboss.osgi.resolver;version="[4.0,5.0)",
                             org.jboss.osgi.resolver.spi;version="[4.0,5.0)",
-                            org.jboss.osgi.repository;version="[3.0,4.0)",
-                            org.jboss.osgi.repository.spi;version="[3.0,4.0)",
+                            org.jboss.osgi.repository;version="[4.0,5.0)",
+                            org.jboss.osgi.repository.spi;version="[4.0,5.0)",
                             org.osgi.framework;version="[1.7,2.0)",
                             org.osgi.resource;version="[1.0,2.0)",
                             org.osgi.service.repository;version="[1.0,2.0)",
@@ -120,8 +128,8 @@
                             org.osgi.util.tracker;version="[1.5,2.0)",
                         </Import-Package>
                         <Private-Package>
-                        	org.jboss.osgi.provision.core, 
-                        	org.jboss.osgi.provision.internal
+                            org.jboss.osgi.provision.core,
+                            org.jboss.osgi.provision.internal
                         </Private-Package>
                     </instructions>
                 </configuration>

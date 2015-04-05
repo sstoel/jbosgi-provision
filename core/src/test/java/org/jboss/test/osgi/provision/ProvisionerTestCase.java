@@ -22,7 +22,7 @@ package org.jboss.test.osgi.provision;
 import java.util.Collections;
 import java.util.Iterator;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jboss.osgi.provision.ProvisionResult;
 import org.jboss.osgi.provision.XResourceProvisioner;
