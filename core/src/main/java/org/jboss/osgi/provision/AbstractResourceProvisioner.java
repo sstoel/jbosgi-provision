@@ -168,12 +168,18 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
             if (XResource.TYPE_ABSTRACT.equals(icaptype)) {
                 if (getRequirementDelegate(icap, XResource.MAVEN_IDENTITY_NAMESPACE) != null) {
                     XRequirement mreq = getRequirementDelegate(icap, XResource.MAVEN_IDENTITY_NAMESPACE);
-                    XCapability mcap = (XCapability) repository.findProviders(mreq).iterator().next();
-                    icap = mcap.getResource().getIdentityCapability();
+                    Iterator<Capability> capIt = repository.findProviders(mreq).iterator();
+                    if (capIt.hasNext()) {
+                        XCapability mcap = (XCapability) capIt.next();
+                        icap = mcap.getResource().getIdentityCapability();
+                    }
                 } else if (getRequirementDelegate(icap, XResource.MODULE_IDENTITY_NAMESPACE) != null) {
                     XRequirement mreq = getRequirementDelegate(icap, XResource.MODULE_IDENTITY_NAMESPACE);
-                    XCapability mcap = (XCapability) repository.findProviders(mreq).iterator().next();
-                    icap = mcap.getResource().getIdentityCapability();
+                    Iterator<Capability> capIt = repository.findProviders(mreq).iterator();
+                    if (capIt.hasNext()) {
+                        XCapability mcap = (XCapability) capIt.next();
+                        icap = mcap.getResource().getIdentityCapability();
+                    }
                 }
 
                 // Remove the abstract requirement
