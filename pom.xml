@@ -46,9 +46,9 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.osgi.framework>3.0.7.Final-SNAPSHOT</version.jboss.osgi.framework>
-        <version.jboss.osgi.repository>4.0.2.Final-SNAPSHOT</version.jboss.osgi.repository>
-        <version.jboss.osgi.resolver>4.0.4.Final-SNAPSHOT</version.jboss.osgi.resolver>
+        <version.jboss.osgi.framework>3.0.7.Final</version.jboss.osgi.framework>
+        <version.jboss.osgi.repository>4.0.2.Final</version.jboss.osgi.repository>
+        <version.jboss.osgi.resolver>4.0.4.Final</version.jboss.osgi.resolver>
         <version.jboss.osgi.testing>2.0.2.Final</version.jboss.osgi.testing>
     </properties>
 
