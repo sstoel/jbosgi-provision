@@ -34,14 +34,14 @@
     <artifactId>jbosgi-provision-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>1.1.2.Final-SNAPSHOT</version>
+    <version>1.1.2.Final</version>
 
     <!-- Source -->
     <scm>
         <connection>scm:git:git://github.com/jbosgi/jbosgi-provision.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-provision.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-provision</url>
-        <tag>HEAD</tag>
+        <tag>1.1.2.Final</tag>
     </scm>
 
     <!-- Properties -->

@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>1.1.2.Final-SNAPSHOT</version>
+        <version>1.1.2.Final</version>
     </parent>
 
     <name>JBossOSGi Provision: Core</name>
