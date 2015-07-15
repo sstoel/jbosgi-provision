@@ -35,7 +35,7 @@
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>1.1.1.Final</version>
+        <version>1.1.2.Final</version>
     </parent>
 
     <!-- Dependencies -->
@@ -88,7 +88,16 @@
             <artifactId>jboss-logmanager</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.jboss.msc</groupId>
+            <artifactId>jboss-msc</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.modules</groupId>
+            <artifactId>jboss-modules</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
