@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>2.0.1.Final-SNAPSHOT</version>
+        <version>2.0.1.Final</version>
     </parent>
 
     <name>JBossOSGi Provision: Bundle</name>
