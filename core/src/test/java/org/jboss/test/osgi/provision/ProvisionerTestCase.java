@@ -152,7 +152,7 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
     @Test
     public void testMavenCoordinates() throws Exception {
 
-        MavenCoordinates mavenid = MavenCoordinates.parse("org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final");
+        MavenCoordinates mavenid = MavenCoordinates.parse("jakarta.transaction:jakarta.transaction-api:2.0.1");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
 
         XResourceProvisioner provisionService = getProvisioner();

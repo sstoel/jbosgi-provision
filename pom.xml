@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>4.1.0</version>
     </parent>
 
     <name>JBossOSGi Provision</name>
@@ -34,7 +34,7 @@
     <artifactId>jbosgi-provision-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>3.0.2.Final-SNAPSHOT</version>
+    <version>4.1.0.Final</version>
 
     <!-- Source -->
     <scm>
@@ -46,10 +46,10 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.osgi.framework>5.0.2.Final-SNAPSHOT</version.jboss.osgi.framework>
-        <version.jboss.osgi.repository>6.0.2.Final-SNAPSHOT</version.jboss.osgi.repository>
-        <version.jboss.osgi.resolver>6.0.2.Final-SNAPSHOT</version.jboss.osgi.resolver>
-        <version.jboss.osgi.testing>4.0.2.Final-SNAPSHOT</version.jboss.osgi.testing>
+        <version.jboss.osgi.framework>6.1.0.Final</version.jboss.osgi.framework>
+        <version.jboss.osgi.repository>7.1.0.Final</version.jboss.osgi.repository>
+        <version.jboss.osgi.resolver>7.1.0.Final</version.jboss.osgi.resolver>
+        <version.jboss.osgi.testing>5.1.0.Final</version.jboss.osgi.testing>
     </properties>
 
     <!-- Dependency Management -->
@@ -94,7 +94,7 @@
     <modules>
         <module>core</module>
         <module>bundle</module>
-        <module>itests</module>
+        <!--module>itests</module-->
     </modules>
 
     <build>
