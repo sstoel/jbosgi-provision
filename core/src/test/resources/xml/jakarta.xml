@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="PersistentRepository">
+    <resource>
+        <capability namespace="osgi.identity">
+            <attribute name="osgi.identity" value="osgi.ee"/>
+            <attribute name="type" value="abstract" />
+        </capability>
+        <capability namespace="osgi.ee">
+            <attribute name="osgi.identity" value="osgi.ee" />
+            <attribute name="osgi.ee" value="JavaSE"/>
+            <attribute name="version" value="1.8"/>
+        </capability>
+    </resource>
+    <resource>
+        <capability namespace="osgi.identity">
+            <attribute name="osgi.identity" value="jakarta.interceptor" />
+            <attribute name="type" value="abstract" />
+        </capability>
+        <capability namespace="osgi.wiring.package">
+            <attribute name='osgi.wiring.package' value='jakarta.interceptor'/>
+            <attribute name='version' type='Version' value='2.0.1'/>
+            <attribute name='bundle-version' type='Version' value='2.0.1'/>
+            <attribute name='bundle-symbolic-name' value='jakarta.interceptor'/>
+        </capability>
+    </resource>
+    <resource>
+        <capability namespace="osgi.identity">
+            <attribute name="osgi.identity" value="jakarta.enterprise.util" />
+            <attribute name="type" value="abstract" />
+        </capability>
+        <capability namespace="osgi.wiring.package">
+            <attribute name='osgi.wiring.package' value='jakarta.enterprise.util'/>
+            <attribute name='bundle-symbolic-name' value='jakarta.enterprise.util'/>
+        </capability>
+    </resource>
+    <resource>
+        <capability namespace="osgi.identity">
+            <attribute name="osgi.identity" value='jakarta.enterprise.context'/>
+            <attribute name="type" value="abstract" />
+        </capability>
+        <capability namespace="osgi.wiring.package">
+            <attribute name='osgi.wiring.package' value='jakarta.enterprise.context'/>
+            <attribute name='bundle-symbolic-name' value='jakarta.enterprise.context'/>
+        </capability>
+    </resource>
+</repository>

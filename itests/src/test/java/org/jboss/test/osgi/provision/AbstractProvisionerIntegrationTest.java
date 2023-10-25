@@ -76,6 +76,7 @@ public abstract class AbstractProvisionerIntegrationTest {
         reader = RepositoryXMLReader.create(input);
         resource = reader.nextResource();
         while (resource != null) {
+            System.out.println("ADDiNG RESOURCE : " + resource);
             storage.addResource(resource);
             resource = reader.nextResource();
         }

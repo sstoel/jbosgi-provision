@@ -19,7 +19,6 @@
  */
 package org.jboss.test.osgi.provision;
 
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,9 +34,9 @@ import org.jboss.osgi.resolver.XRequirement;
 import org.jboss.osgi.resolver.XRequirementBuilder;
 import org.jboss.osgi.resolver.XResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
@@ -63,41 +62,15 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
         final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "provision-tests");
         archive.addClasses(AbstractProvisionerIntegrationTest.class);
         archive.addAsResource("repository/repository.xml");
-        archive.setManifest(new Asset() {
-            @Override
-            public InputStream openStream() {
-                OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
-                builder.addBundleSymbolicName(archive.getName());
-                builder.addBundleManifestVersion(2);
-                builder.addImportPackages(BundleContext.class, XResourceProvisioner.class);
-                builder.addImportPackages(XRepository.class, Repository.class, XResource.class);
-                return builder.openStream();
-            }
+        archive.setManifest(() -> {
+            OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
+            builder.addBundleSymbolicName(archive.getName());
+            builder.addBundleManifestVersion(2);
+            builder.addImportPackages(BundleContext.class, XResourceProvisioner.class);
+            builder.addImportPackages(XRepository.class, Repository.class, XResource.class);
+            return builder.openStream();
         });
         return archive;
-    }
-
-    @Test
-    public void testMavenCoordinates() throws Exception {
-
-        MavenCoordinates mvnid = MavenCoordinates.parse("org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final");
-        XRequirement req = XRequirementBuilder.create(mvnid).getRequirement();
-        Assert.assertNotNull("Requirement not null", req);
-
-        XResourceProvisioner provisionService = getProvisionService();
-        ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
-        Assert.assertEquals("One resource", 1, result.getResources().size());
-        Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
-
-        List<Bundle> bundles = installResources(result.getResources());
-        Assert.assertEquals("One bundle", 1, bundles.size());
-        Bundle bundle = bundles.get(0);
-        try {
-            Assert.assertEquals("org.jboss.spec.javax.transaction.jboss-transaction-api_1.1_spec", bundle.getSymbolicName());
-            Assert.assertEquals(Version.parseVersion("1.0.1.Final"), bundle.getVersion());
-        } finally {
-            bundle.uninstall();
-        }
     }
 
     @Test
@@ -128,9 +101,33 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
                 try {
                     b.uninstall();
                 }
-                catch (Exception e) {
+                catch (Exception ignored) {
                 }
             }
+        }
+    }
+
+    @Test
+    public void testMavenCoordinates() throws Exception {
+
+        MavenCoordinates mvnid = MavenCoordinates.parse("jakarta.transaction:jakarta.transaction-api:2.0.1");
+        XRequirement req = XRequirementBuilder.create(mvnid).getRequirement();
+        Assert.assertNotNull("Requirement not null", req);
+
+        XResourceProvisioner provisionService = getProvisionService();
+        ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
+        Assert.assertEquals("One resource", 1, result.getResources().size());
+        result.getUnsatisfiedRequirements().forEach(System.out::println);
+        Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
+
+        List<Bundle> bundles = installResources(result.getResources());
+        Assert.assertEquals("One bundle", 1, bundles.size());
+        Bundle bundle = bundles.get(0);
+        try {
+            Assert.assertEquals("jakarta.transaction-api", bundle.getSymbolicName());
+            Assert.assertEquals(Version.parseVersion("2.0.1"), bundle.getVersion());
+        } finally {
+            bundle.uninstall();
         }
     }
 }

@@ -47,6 +47,8 @@ import org.osgi.framework.namespace.IdentityNamespace;
  */
 public class ProvisionerTestCase extends AbstractProvisionerTest {
 
+    private static final String REPOSITORY = "xml/jakarta.xml";
+
     @Test
     public void testEmptyEnvironment() {
         XEnvironment env = getEnvironment();
@@ -151,13 +153,15 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
 
     @Test
     public void testMavenCoordinates() throws Exception {
-
+        setupFrameworkEnvironment();
+        setupRepository(REPOSITORY);
         MavenCoordinates mavenid = MavenCoordinates.parse("jakarta.transaction:jakarta.transaction-api:2.0.1");
         XRequirement req = XRequirementBuilder.create(mavenid).getRequirement();
 
         XResourceProvisioner provisionService = getProvisioner();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
         Assert.assertEquals("One resource", 1, result.getResources().size());
+        result.getUnsatisfiedRequirements().forEach(System.out::println);
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
     }
 }

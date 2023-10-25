@@ -30,6 +30,17 @@
     <!-- Dependency Sets -->
     <dependencySets>
 
+        <!-- lib -->
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
+            <includes>
+                <include>*:jakarta.interceptor-api:jar</include>
+            </includes>
+            <scope>compile</scope>
+            <unpack>false</unpack>
+        </dependencySet>
+
         <!-- bundles -->
         <dependencySet>
             <outputDirectory>bundles</outputDirectory>

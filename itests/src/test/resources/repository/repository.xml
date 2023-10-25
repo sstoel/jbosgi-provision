@@ -15,7 +15,45 @@
       <attribute name="type" value="abstract" />
     </capability>
     <requirement namespace="maven.identity">
-      <attribute name="maven.identity" value="org.apache.felix:org.apache.felix.eventadmin:jar:1.3.0" />
+      <attribute name="maven.identity" value="org.apache.felix:org.apache.felix.eventadmin:jar:1.6.4" />
     </requirement>
+  </resource>
+  <resource>
+    <capability namespace="osgi.identity">
+      <attribute name="osgi.identity" value="jakarta.interceptor" />
+      <attribute name="type" value="abstract" />
+    </capability>
+    <capability namespace='osgi.content'>
+      <attribute name='osgi.content' value='unknown-digest' />
+      <attribute name='mime' value='application/vnd.osgi.bundle'/>
+      <attribute name='url' value='file:./target/test-libs/lib/jakarta-interceptor-api-2.0.1.jar'/>
+      <attribute name='size' value='0'/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name='osgi.wiring.package' value='jakarta.interceptor'/>
+      <attribute name='version' type='Version' value='2.0.1'/>
+      <attribute name='bundle-version' type='Version' value='2.0.1'/>
+      <attribute name='bundle-symbolic-name' value='jakarta.interceptor'/>
+    </capability>
+  </resource>
+  <resource>
+    <capability namespace="osgi.identity">
+      <attribute name="osgi.identity" value="jakarta.enterprise.util" />
+      <attribute name="type" value="abstract" />
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name='osgi.wiring.package' value='jakarta.enterprise.util'/>
+      <attribute name='bundle-symbolic-name' value='jakarta.enterprise.util'/>
+    </capability>
+  </resource>
+  <resource>
+    <capability namespace="osgi.identity">
+      <attribute name="osgi.identity" value='jakarta.enterprise.context'/>
+      <attribute name="type" value="abstract" />
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name='osgi.wiring.package' value='jakarta.enterprise.context'/>
+      <attribute name='bundle-symbolic-name' value='jakarta.enterprise.context'/>
+    </capability>
   </resource>
 </repository>
