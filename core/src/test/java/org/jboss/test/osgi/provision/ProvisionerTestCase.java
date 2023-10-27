@@ -161,7 +161,6 @@ public class ProvisionerTestCase extends AbstractProvisionerTest {
         XResourceProvisioner provisionService = getProvisioner();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
         Assert.assertEquals("One resource", 1, result.getResources().size());
-        result.getUnsatisfiedRequirements().forEach(System.out::println);
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
     }
 }
