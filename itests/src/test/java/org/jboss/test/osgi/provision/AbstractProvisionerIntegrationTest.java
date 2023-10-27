@@ -58,11 +58,11 @@ public abstract class AbstractProvisionerIntegrationTest {
     BundleContext context;
 
     @Before
-    public void setUp () throws Exception {
+    public void setUp () {
         initializeRepository();
     }
 
-    void initializeRepository() throws Exception {
+    void initializeRepository() {
         // remove all resources
         RepositoryStorage storage = getRepository().adapt(RepositoryStorage.class);
         RepositoryReader reader = storage.getRepositoryReader();
@@ -76,7 +76,6 @@ public abstract class AbstractProvisionerIntegrationTest {
         reader = RepositoryXMLReader.create(input);
         resource = reader.nextResource();
         while (resource != null) {
-            System.out.println("ADDiNG RESOURCE : " + resource);
             storage.addResource(resource);
             resource = reader.nextResource();
         }
@@ -102,7 +101,7 @@ public abstract class AbstractProvisionerIntegrationTest {
     }
 
     List<Bundle> installResources(List<XResource> resources) throws ProvisionException {
-        List<Bundle> result = new ArrayList<Bundle>();
+        List<Bundle> result = new ArrayList<>();
         for (XResource res : resources) {
             try {
                 String location = "resource" + installIndex.incrementAndGet();
