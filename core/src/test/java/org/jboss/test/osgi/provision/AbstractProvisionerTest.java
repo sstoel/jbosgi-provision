@@ -98,12 +98,8 @@ public abstract class AbstractProvisionerTest {
 
     void setupFrameworkEnvironment() {
         OSGiMetaDataBuilder builder = OSGiMetaDataBuilder.createBuilder(Constants.SYSTEM_BUNDLE_SYMBOLICNAME, Version.emptyVersion);
-        for (String packageSpec : SystemPaths.DEFAULT_SYSTEM_PACKAGES) {
-            builder.addExportPackages(packageSpec);
-        }
-        for (String packageSpec : SystemPaths.DEFAULT_FRAMEWORK_PACKAGES) {
-            builder.addExportPackages(packageSpec);
-        }
+        builder.addExportPackages(SystemPaths.DEFAULT_SYSTEM_PACKAGES);
+        builder.addExportPackages(SystemPaths.DEFAULT_FRAMEWORK_PACKAGES);
         OSGiMetaData systemMetaData = builder.getOSGiMetaData();
         XResourceBuilder<XResource> factory = XResourceBuilderFactory.create();
         XResource systemResource = factory.loadFrom(systemMetaData).getResource();

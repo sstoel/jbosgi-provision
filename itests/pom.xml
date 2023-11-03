@@ -23,6 +23,7 @@
   Set these VM properties in your IDE debugger 
   
   -Djava.util.logging.manager=org.jboss.logmanager.LogManager
+  -Xbootclasspath/a:/Users/pieterjan.eilers/Projects/jbosgi/jbosgi/wildfly/build/target/wildfly-30.0.0.Beta1/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-2.1.19.Final.jar
   -Dtest.archive.directory=${workspace_loc:jbosgi-provision-itests/target}/test-libs
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -45,6 +46,12 @@
             <artifactId>jbosgi-provision-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.interceptor</groupId>
+            <artifactId>jakarta.interceptor-api</artifactId>
+            <version>2.0.1</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.osgi.provision</groupId>
@@ -71,6 +78,12 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.osgi</groupId>
+            <artifactId>arquillian-osgi-bundle</artifactId>
+            <version>2.2.2.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -119,7 +132,7 @@
                         <id>bundles</id>
                         <phase>test-compile</phase>
                         <goals>
-                            <goal>directory-single</goal>
+                            <goal>single</goal>
                         </goals>
                         <configuration>
                             <finalName>test-libs</finalName>
@@ -138,6 +151,7 @@
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <jboss.osgi.framework.properties>${jboss.osgi.framework.properties}</jboss.osgi.framework.properties>
+                        <jboss.modules.system.pkgs>java.util.logging</jboss.modules.system.pkgs>
                         <test.archive.directory>${project.build.directory}/test-libs</test.archive.directory>
                     </systemPropertyVariables>
                 </configuration>
