@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>4.2.0.Final</version>
+        <version>4.3.0.Final</version>
     </parent>
 
     <name>JBossOSGi Provision: Bundle</name>
@@ -115,8 +115,8 @@
                         <Import-Package>
                             org.jboss.logging;version="[3.0,4.0)",
                             org.jboss.modules;version="[1.2,2.0)",
-                            org.jboss.osgi.resolver;version="[6.0,7.1)",
-                            org.jboss.osgi.resolver.spi;version="[6.0,7.1)",
+                            org.jboss.osgi.resolver;version="[6.0,7.3)",
+                            org.jboss.osgi.resolver.spi;version="[6.0,7.3)",
                             org.jboss.osgi.repository;version="[6.0,8.0)",
                             org.jboss.osgi.repository.spi;version="[6.0,8.0)",
                             org.osgi.framework;version="[1.7,2.0)",
