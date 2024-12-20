@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>4.3.0</version>
+        <version>4.4.0</version>
     </parent>
 
     <name>JBossOSGi Provision</name>
@@ -34,7 +34,7 @@
     <artifactId>jbosgi-provision-parent</artifactId>
     <packaging>pom</packaging>
 
-    <version>4.3.0.Final</version>
+    <version>4.4.0.Final</version>
 
     <!-- Source -->
     <scm>
@@ -46,10 +46,10 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.osgi.framework>6.3.0.Final</version.jboss.osgi.framework>
-        <version.jboss.osgi.repository>7.3.0.Final</version.jboss.osgi.repository>
-        <version.jboss.osgi.resolver>7.3.0.Final</version.jboss.osgi.resolver>
-        <version.jboss.osgi.testing>5.3.0.Final</version.jboss.osgi.testing>
+        <version.jboss.osgi.framework>6.4.0.Final</version.jboss.osgi.framework>
+        <version.jboss.osgi.repository>7.4.0.Final</version.jboss.osgi.repository>
+        <version.jboss.osgi.resolver>7.4.0.Final</version.jboss.osgi.resolver>
+        <version.jboss.osgi.testing>5.4.0.Final</version.jboss.osgi.testing>
     </properties>
 
     <!-- Dependency Management -->
