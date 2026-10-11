@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.jboss.osgi.provision</groupId>
         <artifactId>jbosgi-provision-parent</artifactId>
-        <version>4.6.0.Final</version>
+        <version>4.7.0.Final</version>
     </parent>
 
     <name>JBossOSGi Provision: Bundle</name>
@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
+            <artifactId>osgi.core</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
