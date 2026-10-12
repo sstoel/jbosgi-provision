@@ -26,7 +26,7 @@
     <capability namespace='osgi.content'>
       <attribute name='osgi.content' value='unknown-digest' />
       <attribute name='mime' value='application/vnd.osgi.bundle'/>
-      <attribute name='url' value='file:./target/test-libs/lib/jakarta-interceptor-api-2.0.1.jar'/>
+      <attribute name='url' value='file:./target/test-libs/lib/jakarta.interceptor-api-2.1.0.jar'/>
       <attribute name='size' value='0'/>
     </capability>
     <capability namespace="osgi.wiring.package">

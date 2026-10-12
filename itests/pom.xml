@@ -23,7 +23,7 @@
   Set these VM properties in your IDE debugger 
   
   -Djava.util.logging.manager=org.jboss.logmanager.LogManager
-  -Xbootclasspath/a:/Users/pieterjan.eilers/Projects/jbosgi/jbosgi/wildfly/build/target/wildfly-30.0.0.Beta1/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-2.1.19.Final.jar
+  -Xbootclasspath/a:${jboss.home}/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-2.1.19.Final.jar
   -Dtest.archive.directory=${workspace_loc:jbosgi-provision-itests/target}/test-libs
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">

@@ -98,7 +98,7 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
             if (res.getState() != State.INSTALLED) {
                 envclone.installResources(res);
                 unresolved.add(res);
-                LOGGER.debugf("installed and unresolved: "  + res);
+                LOGGER.debugf("Installed and unresolved: %s", res);
             }
         }
 

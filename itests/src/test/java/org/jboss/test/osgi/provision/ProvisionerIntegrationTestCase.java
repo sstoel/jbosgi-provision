@@ -36,7 +36,6 @@ import org.jboss.osgi.resolver.XResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
@@ -117,7 +116,6 @@ public class ProvisionerIntegrationTestCase extends AbstractProvisionerIntegrati
         XResourceProvisioner provisionService = getProvisionService();
         ProvisionResult result = provisionService.findResources(getEnvironment(), Collections.singleton(req));
         Assert.assertEquals("One resource", 1, result.getResources().size());
-        result.getUnsatisfiedRequirements().forEach(System.out::println);
         Assert.assertTrue("Nothing unsatisfied", result.getUnsatisfiedRequirements().isEmpty());
 
         List<Bundle> bundles = installResources(result.getResources());
