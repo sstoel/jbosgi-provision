@@ -27,6 +27,7 @@ import static org.jboss.osgi.provision.ProvisionMessages.MESSAGES;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -143,26 +144,33 @@ public class ProvisionerSupport {
             throw MESSAGES.illegalArgumentNull("features");
 
         for (String feature : features) {
-            InputStream input = getFeatureResource(classLoader, feature);
-            if (input != null) {
-                RepositoryReader reader = RepositoryXMLReader.create(input);
-                XResource auxres = reader.nextResource();
-                while (auxres != null) {
-                    XIdentityCapability icap = auxres.getIdentityCapability();
-                    String nsvalue = (String) icap.getAttribute(icap.getNamespace());
-                    XRequirement ireq = XRequirementBuilder.create(icap.getNamespace(), nsvalue).getRequirement();
-                    RepositoryStorage storage = getRepository().adapt(RepositoryStorage.class);
-                    if (storage.findProviders(ireq).isEmpty()) {
-                        storage.addResource(auxres);
+            URL featureURL = getFeatureResource(classLoader, feature);
+            if (featureURL == null)
+                throw MESSAGES.cannotObtainFeature(feature);
+            try (InputStream input = featureURL.openStream()) {
+                RepositoryReader reader = RepositoryXMLReader.create(input, featureURL);
+                try {
+                    XResource auxres = reader.nextResource();
+                    while (auxres != null) {
+                        XIdentityCapability icap = auxres.getIdentityCapability();
+                        String nsvalue = (String) icap.getAttribute(icap.getNamespace());
+                        XRequirement ireq = XRequirementBuilder.create(icap.getNamespace(), nsvalue).getRequirement();
+                        RepositoryStorage storage = getRepository().adapt(RepositoryStorage.class);
+                        if (storage.findProviders(ireq).isEmpty()) {
+                            storage.addResource(auxres);
+                        }
+                        auxres = reader.nextResource();
                     }
-                    auxres = reader.nextResource();
+                } finally {
+                    reader.close();
                 }
             }
         }
     }
 
-    private InputStream getFeatureResource(ClassLoader classLoader, String feature) {
+    private URL getFeatureResource(ClassLoader classLoader, String feature) {
         // [TODO] parameterize this
-        return classLoader.getResourceAsStream("/repository/" + feature  + ".xml");
+        // A class loader resource name is relative to the class path roots, it has no leading '/'
+        return classLoader.getResource("repository/" + feature  + ".xml");
     }
 }

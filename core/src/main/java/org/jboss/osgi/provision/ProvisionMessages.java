@@ -52,4 +52,7 @@ public interface ProvisionMessages {
 
     @Message(id = 20352, value = "Unsatisfied requirements: %s")
     IllegalStateException unsatiesfiedRequirements(Set<XRequirement> reqs);
+
+    @Message(id = 20353, value = "Cannot obtain feature: %s")
+    IllegalArgumentException cannotObtainFeature(String feature);
 }
