@@ -90,16 +90,22 @@ public class AbstractResourceProvisioner implements XResourceProvisioner {
         LOGGER.debugf("START findResources: %s", reqs);
 
         // Install the unresolved resources into the cloned environment
+        // An installed resource is not necessarily resolved, it must be resolved as well
         List<XResource> unresolved = new ArrayList<XResource>();
         XEnvironment envclone = cloneEnvironment(env);
         LOGGER.debugf("Cloned environment");
         for (XRequirement req : reqs) {
             XResource res = req.getResource();
+            if (unresolved.contains(res) || res.getWiringSupport().getWiring(true) != null) {
+                continue;
+            }
             if (res.getState() != State.INSTALLED) {
                 envclone.installResources(res);
-                unresolved.add(res);
                 LOGGER.debugf("Installed and unresolved: %s", res);
+            } else {
+                LOGGER.debugf("Unresolved: %s", res);
             }
+            unresolved.add(res);
         }
 
         // Find the resources in the cloned environment
